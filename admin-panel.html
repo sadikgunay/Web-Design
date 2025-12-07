@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Yönetici Paneli | SAATÜRN</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Courier+Prime&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>if(localStorage.getItem("saaturn_session") !== "active") window.location.href = "admin-login.html";</script>
+    <style>
+        :root { --gold: #D4AF37; --dark: #050505; --panel: #111; }
+        body { background-color: var(--dark); color: #e0e0e0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
+        
+        /* SIDEBAR & RESPONSIVE AYARLARI */
+        .sidebar { 
+            background: #000; 
+            border-right: 1px solid #222; 
+            min-height: 100vh; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 250px; 
+            padding-top: 30px; 
+            z-index: 1050; 
+            transition: 0.3s ease-in-out;
+        }
+        
+        .main-content { 
+            margin-left: 250px; 
+            padding: 40px; 
+            transition: 0.3s ease-in-out;
+        }
+
+        /* Mobil Menü Butonu (Normalde Gizli) */
+        .mobile-toggle-btn { display: none; color: var(--gold); background: none; border: 1px solid var(--gold); padding: 5px 10px; border-radius: 5px; margin-bottom: 20px; }
+        .sidebar-close-btn { display: none; position: absolute; top: 10px; right: 10px; color: #fff; background: none; border: none; }
+
+        /* MOBİL GÖRÜNÜM (768px altı) */
+        @media (max-width: 768px) {
+            .sidebar { left: -250px; } /* Sidebar'ı sola sakla */
+            .sidebar.active { left: 0; box-shadow: 10px 0 20px rgba(0,0,0,0.8); } /* Açılınca göster */
+            .main-content { margin-left: 0; padding: 20px; } /* İçeriği genişlet */
+            .mobile-toggle-btn { display: inline-block; } /* Menü butonunu göster */
+            .sidebar-close-btn { display: block; } /* Kapat butonunu göster */
+        }
+
+        .nav-link { color: #bbb; padding: 12px 20px; display: flex; align-items: center; text-decoration: none; transition: 0.3s; }
+        .nav-link:hover, .nav-link.active { color: var(--gold); background: rgba(212, 175, 55, 0.05); border-right: 3px solid var(--gold); }
+        
+        .stat-card { background: var(--panel); border: 1px solid #222; border-radius: 12px; padding: 25px; position: relative; transition: 0.3s; }
+        .stat-card:hover { border-color: var(--gold); transform: translateY(-5px); }
+        .stat-val { font-size: 2.2rem; font-weight: 700; color: #fff; margin: 10px 0; }
+        .stat-label { font-size: 0.75rem; color: var(--gold); letter-spacing: 1px; font-weight: 600; text-transform: uppercase; }
+        
+        .table-custom { --bs-table-bg: var(--panel); border: 1px solid #222; color: #ccc; margin-top: 20px; }
+        .table-custom th { color: var(--gold); border-bottom: 1px solid #333; padding: 15px; font-weight: normal; font-size: 0.85rem; letter-spacing: 1px; }
+        .table-custom td { border-bottom: 1px solid #222; padding: 15px; color: #ddd; vertical-align: middle; font-size: 0.9rem; }
+        
+        #receiptArea { display: none; } 
+        
+        @media print {
+            body * { visibility: hidden; } 
+            .modal { display: none !important; }
+            #receiptArea, #receiptArea * { visibility: visible !important; color: #000 !important; }
+            #receiptArea { display: block !important; position: absolute; left: 0; top: 0; width: 100%; background: #fff; padding: 20px; z-index: 9999; }
+        }
+        
+        .modal-content { background: #1a1a1a; border: 1px solid #333; color: #fff; }
+        .modal-header { border-bottom: 1px solid #333; }
+        .detail-label { font-size: 0.7rem; color: var(--gold); letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .detail-val { font-size: 1rem; color: #fff; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        
+        /* Dosya Yükleme Inputu Gizli */
+        #backupFile { display: none; }
+    </style>
+</head>
+<body onload="initDashboard()">
+
+    <nav class="sidebar" id="sidebarMenu">
+        <button class="sidebar-close-btn" onclick="toggleSidebar()"><i data-feather="x"></i></button>
+        <div class="text-center mb-5"><h4 class="text-warning fw-bold">SAATÜRN</h4><small class="text-muted">YÖNETİCİ PANELİ</small></div>
+        <div class="d-flex flex-column">
+            <a href="admin-panel.html" class="nav-link active"><span data-feather="grid"></span> Genel Bakış</a>
+            <a href="admin-urunler.html" class="nav-link"><span data-feather="box"></span> Ürün Yönetimi</a>
+            <a href="admin-duyuru-ekle.html" class="nav-link"><span data-feather="edit"></span> Duyuru Yönetimi</a>
+            <a href="istatistik.html" class="nav-link"><span data-feather="pie-chart"></span> İstatistikler</a>
+            
+            <div class="mt-4 px-3">
+                <small class="text-muted d-block mb-2 text-uppercase" style="font-size:0.7rem; letter-spacing:1px;">Veri İşlemleri</small>
+                <button onclick="downloadBackup()" class="btn btn-outline-light btn-sm w-100 mb-2 text-start"><i data-feather="download" style="width:14px;"></i> Yedek Al (İndir)</button>
+                <button onclick="document.getElementById('backupFile').click()" class="btn btn-outline-warning btn-sm w-100 text-start"><i data-feather="upload" style="width:14px;"></i> Yedek Yükle</button>
+                <input type="file" id="backupFile" accept=".json" onchange="restoreBackup(this)">
+            </div>
+
+            <div class="mt-4 border-top border-secondary pt-3">
+                <a href="index.html" class="nav-link"><span data-feather="external-link"></span> Siteye Git</a>
+                <a href="#" onclick="logout()" class="nav-link text-danger"><span data-feather="log-out"></span> Çıkış Yap</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <button class="mobile-toggle-btn" onclick="toggleSidebar()">
+            <i data-feather="menu"></i> MENÜ
+        </button>
+
+        <div class="d-flex justify-content-between flex-wrap align-items-end mb-5 gap-3">
+            <div><h6 class="text-secondary mb-1">HOŞGELDİNİZ</h6><h3 class="fw-bold m-0 text-white">Admin Paneli</h3></div>
+            <button class="btn btn-outline-danger btn-sm" onclick="forceReset()">Tüm Verileri Sil </button>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-6 col-md-3"><div class="stat-card"><span data-feather="users" class="position-absolute top-0 end-0 m-3 text-secondary"></span><div class="stat-label">TOPLAM ÜYE</div><div class="stat-val" id="totalUsers">0</div></div></div>
+            <div class="col-6 col-md-3"><div class="stat-card"><span data-feather="shopping-cart" class="position-absolute top-0 end-0 m-3 text-secondary"></span><div class="stat-label">SİPARİŞLER</div><div class="stat-val" id="totalOrder">0</div></div></div>
+            <div class="col-6 col-md-3"><div class="stat-card"><span data-feather="dollar-sign" class="position-absolute top-0 end-0 m-3 text-secondary"></span><div class="stat-label">CİRO</div><div class="stat-val text-warning" style="font-size:1.5rem;" id="totalRevenue">0 ₺</div></div></div>
+            <div class="col-6 col-md-3"><div class="stat-card"><span data-feather="mail" class="position-absolute top-0 end-0 m-3 text-secondary"></span><div class="stat-label">MESAJLAR</div><div class="stat-val" id="totalMsg">0</div></div></div>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-12">
+                <h5 class="text-white">📦 Sipariş Yönetimi</h5>
+                <div class="table-responsive">
+                    <table class="table table-custom table-hover">
+                        <thead><tr><th>#ID</th><th>MÜŞTERİ</th><th>ÜRÜN</th><th>TUTAR</th><th>DURUM</th><th>İŞLEM</th></tr></thead>
+                        <tbody id="orderTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-12">
+                <h5 class="text-white">📩 Gelen Mesajlar</h5>
+                <div class="table-responsive">
+                    <table class="table table-custom table-hover">
+                        <thead><tr><th>GÖNDEREN</th><th>KONU</th><th>E-POSTA</th><th>MESAJ</th><th>TARİH</th></tr></thead>
+                        <tbody id="messageTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-lg-6">
+                <h5 class="text-white">👥 Kayıtlı Müşteriler</h5>
+                <div class="table-responsive">
+                    <table class="table table-custom table-hover">
+                        <thead><tr><th>AD SOYAD</th><th>E-POSTA</th><th>KAYIT TARİHİ</th></tr></thead>
+                        <tbody id="userTable"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="d-flex justify-content-between align-items-center mt-4 mt-lg-0">
+                    <h5 class="text-white">📰 Bülten Aboneleri</h5>
+                    <span class="badge bg-warning text-dark" id="subCount">0 Abone</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-custom table-hover">
+                        <thead><tr><th>E-POSTA</th><th>ABONELİK TARİHİ</th><th>İŞLEM</th></tr></thead>
+                        <tbody id="subscriberTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="orderDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title text-warning">Sipariş Detayı #<span id="mdlId"></span></h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body p-4">
+                    <div class="row">
+                        <div class="col-6"><span class="detail-label">MÜŞTERİ ADI</span><div class="detail-val" id="mdlName">...</div></div>
+                        <div class="col-6"><span class="detail-label">TARİH</span><div class="detail-val" id="mdlDate">...</div></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6"><span class="detail-label">TELEFON</span><div class="detail-val" id="mdlPhone">...</div></div>
+                        <div class="col-6"><span class="detail-label">E-POSTA</span><div class="detail-val text-break" id="mdlEmail">...</div></div>
+                    </div>
+                    <span class="detail-label">TESLİMAT ADRESİ</span><div class="detail-val" id="mdlAddress">...</div>
+                    <span class="detail-label">SİPARİŞ EDİLEN ÜRÜN</span><div class="detail-val text-warning fw-bold" id="mdlProduct">...</div>
+                    <div class="row">
+                        <div class="col-6"><span class="detail-label">ÖDEME</span><div class="detail-val" id="mdlPayment">...</div></div>
+                        <div class="col-6"><span class="detail-label">TUTAR</span><div class="detail-val text-success" id="mdlPrice">...</div></div>
+                    </div>
+                    <div class="d-grid gap-2"><button class="btn btn-outline-light btn-sm" onclick="printReceipt()"><i data-feather="printer" class="me-2"></i>Sipariş Fişini Yazdır</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="receiptArea">
+        <div style="text-align:center; border-bottom:2px dashed #000; padding-bottom:10px; margin-bottom:10px;">
+            <h2 style="margin:0; font-family: 'Courier Prime', monospace;">SAATÜRN</h2>
+            <small>Lüks Saat Mağazacılık A.Ş.</small><br><small>Umuttepe / KOCAELİ</small>
+        </div>
+        <div style="margin-bottom:15px; font-family: 'Courier Prime', monospace;">
+            <strong>Tarih:</strong> <span id="rDate"></span><br>
+            <strong>Sipariş No:</strong> #<span id="rId"></span><br>
+            <strong>Müşteri:</strong> <span id="rName"></span><br>
+            <strong>Telefon:</strong> <span id="rPhone"></span>
+        </div>
+        <table style="width:100%; margin-bottom:15px; border-collapse: collapse; font-family: 'Courier Prime', monospace;">
+            <tr style="border-bottom:1px solid #000;"><td style="padding:5px 0;">Ürün</td><td style="text-align:right;">Tutar</td></tr>
+            <tr><td style="padding:10px 0;" id="rProduct">...</td><td style="text-align:right;" id="rPrice">...</td></tr>
+        </table>
+        <div style="text-align:right; font-weight:bold; font-size:1.2rem; margin-bottom:20px; font-family: 'Courier Prime', monospace;">TOPLAM: <span id="rTotal">...</span></div>
+        <div style="text-align:center; font-size:0.8rem; font-family: 'Courier Prime', monospace;">
+            <p>Ödeme Yöntemi: <span id="rPayment"></span></p>
+            <p>Teslimat Adresi: <br><span id="rAddress"></span></p>
+            <p style="margin-top:20px;">*** TEŞEKKÜR EDERİZ ***</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        feather.replace();
+
+        function initDashboard() {
+            const orders = JSON.parse(localStorage.getItem('saaturnSiparisleri')) || [];
+            const users = JSON.parse(localStorage.getItem('saaturnUsers')) || [];
+            const messages = JSON.parse(localStorage.getItem('saaturnRandevular')) || [];
+            const subscribers = JSON.parse(localStorage.getItem('saaturnAboneler')) || [];
+            
+            document.getElementById('totalOrder').innerText = orders.length;
+            document.getElementById('totalUsers').innerText = users.length;
+            document.getElementById('totalMsg').innerText = messages.length;
+            document.getElementById('subCount').innerText = subscribers.length + " Abone";
+            
+            let revenue = 0;
+            orders.forEach(o => { if(o.fiyat) revenue += parseInt(o.fiyat.replace(/\./g,'').replace(' ₺','')); });
+            document.getElementById('totalRevenue').innerText = revenue.toLocaleString('tr-TR') + ' ₺';
+
+            fillTable('orderTable', orders, 'order');
+            fillTable('messageTable', messages, 'message');
+            fillTable('userTable', users, 'user');
+            fillTable('subscriberTable', subscribers, 'subscriber'); 
+            
+            feather.replace();
+        }
+
+        function fillTable(tableId, data, type) {
+            const tbody = document.getElementById(tableId);
+            tbody.innerHTML = '';
+            if(!data || data.length === 0) tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">Henüz veri yok.</td></tr>';
+            else {
+                [...data].reverse().slice(0, 10).forEach(item => {
+                    let row = '';
+                    if(type === 'order') {
+                        let isShipped = item.durum === 'Kargolandı';
+                        row = `<tr>
+                            <td>#${item.id}</td>
+                            <td class="text-white">${item.ad}</td>
+                            <td>${item.urun}</td>
+                            <td class="text-warning">${item.fiyat}</td>
+                            <td><span class="badge ${isShipped ? 'bg-success' : 'bg-warning text-dark'}">${item.durum}</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-info me-1" onclick="viewOrder(${item.id})"><i data-feather="printer" style="width:14px;"></i></button>
+                                <button class="btn btn-sm ${isShipped ? 'btn-success disabled' : 'btn-outline-warning'}" onclick="toggleStatus(${item.id})"><i data-feather="truck" style="width:14px;"></i></button>
+                            </td>
+                        </tr>`;
+                    } else if(type === 'message') {
+                        row = `<tr><td class="text-white">${item.isim}</td><td><span class="badge bg-secondary">${item.konu}</span></td><td class="text-info">${item.email}</td><td class="text-truncate" style="max-width:150px;">${item.mesaj || '-'}</td><td>${item.tarih}</td></tr>`;
+                    } else if(type === 'user') {
+                        row = `<tr><td class="text-white">${item.ad} ${item.soyad}</td><td class="text-info">${item.email}</td><td>${item.tarih}</td></tr>`;
+                    } else if(type === 'subscriber') {
+                        row = `<tr><td class="text-white">${item.email}</td><td>${item.tarih}</td><td><button class="btn btn-sm btn-outline-danger" onclick="deleteSubscriber('${item.email}')"><i data-feather="trash-2" style="width:14px;"></i></button></td></tr>`;
+                    }
+                    tbody.innerHTML += row;
+                });
+            }
+        }
+
+        // --- YENİ EKLENEN FONKSİYONLAR ---
+
+        // 1. Sidebar Aç/Kapa
+        function toggleSidebar() {
+            document.getElementById('sidebarMenu').classList.toggle('active');
+        }
+
+        // 2. Yedek Alma (JSON İndirme)
+        function downloadBackup() {
+            const backupData = {
+                orders: localStorage.getItem('saaturnSiparisleri'),
+                users: localStorage.getItem('saaturnUsers'),
+                messages: localStorage.getItem('saaturnRandevular'),
+                subscribers: localStorage.getItem('saaturnAboneler')
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "saaturn_yedek_" + new Date().toISOString().slice(0,10) + ".json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        // 3. Yedek Yükleme (JSON Okuma)
+        function restoreBackup(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (confirm("Bu işlem mevcut verilerin üzerine yazacak. Emin misiniz?")) {
+                        if(data.orders) localStorage.setItem('saaturnSiparisleri', data.orders);
+                        if(data.users) localStorage.setItem('saaturnUsers', data.users);
+                        if(data.messages) localStorage.setItem('saaturnRandevular', data.messages);
+                        if(data.subscribers) localStorage.setItem('saaturnAboneler', data.subscribers);
+                        
+                        alert("✅ Veriler başarıyla yüklendi! Sayfa yenileniyor...");
+                        location.reload();
+                    }
+                } catch (err) {
+                    alert("❌ Hata: Geçersiz yedek dosyası!");
+                    console.error(err);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // --- MEVCUT FONKSİYONLAR ---
+        function deleteSubscriber(email) {
+            if(confirm(email + " silinecek?")) {
+                let subs = JSON.parse(localStorage.getItem('saaturnAboneler')) || [];
+                const newSubs = subs.filter(s => s.email !== email);
+                localStorage.setItem('saaturnAboneler', JSON.stringify(newSubs));
+                initDashboard();
+            }
+        }
+
+        function viewOrder(id) {
+            const orders = JSON.parse(localStorage.getItem('saaturnSiparisleri'));
+            const o = orders.find(x => x.id == id);
+            if(o) {
+                const phone = o.telefon || "Belirtilmemiş";
+                const email = o.email || "-";
+                const address = o.adres || "Adres bilgisi yok";
+                const payment = o.odeme || "Kredi Kartı";
+
+                document.getElementById('mdlId').innerText = o.id;
+                document.getElementById('mdlName').innerText = o.ad;
+                document.getElementById('mdlDate').innerText = o.tarih;
+                document.getElementById('mdlProduct').innerText = o.urun;
+                document.getElementById('mdlPrice').innerText = o.fiyat;
+                document.getElementById('mdlPayment').innerText = payment;
+                document.getElementById('mdlPhone').innerText = phone;
+                document.getElementById('mdlEmail').innerText = email;
+                document.getElementById('mdlAddress').innerText = address;
+
+                document.getElementById('rId').innerText = o.id;
+                document.getElementById('rName').innerText = o.ad;
+                document.getElementById('rDate').innerText = o.tarih;
+                document.getElementById('rProduct').innerText = o.urun;
+                document.getElementById('rPrice').innerText = o.fiyat;
+                document.getElementById('rTotal').innerText = o.fiyat;
+                document.getElementById('rPayment').innerText = payment;
+                document.getElementById('rPhone').innerText = phone;
+                document.getElementById('rAddress').innerText = address;
+
+                new bootstrap.Modal(document.getElementById('orderDetailModal')).show();
+            }
+        }
+
+        function printReceipt() { window.print(); }
+
+        function toggleStatus(id) {
+            let orders = JSON.parse(localStorage.getItem('saaturnSiparisleri'));
+            let order = orders.find(o => o.id == id);
+            if(order && order.durum === 'Hazırlanıyor') {
+                order.durum = 'Kargolandı';
+                localStorage.setItem('saaturnSiparisleri', JSON.stringify(orders));
+                initDashboard();
+            }
+        }
+
+        function forceReset() {
+            if(confirm("TÜM VERİLER SİLİNECEK! Emin misiniz?")) {
+                localStorage.clear();
+                localStorage.setItem("saaturn_session", "active");
+                location.reload();
+            }
+        }
+
+        function logout() { localStorage.removeItem('saaturn_session'); window.location.href = 'admin-login.html'; }
+    </script>
+</body>
+</html>

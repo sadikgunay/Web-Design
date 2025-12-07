@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Siparişlerim | SAATÜRN</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+    
+    <style>
+        /* --- TEMA AYARLARI --- */
+        :root { --gold-start: #BF953F; --gold-mid: #FCF6BA; --gold-end: #B38728; --black-bg: #050505; --card-bg: rgba(255, 255, 255, 0.03); --border-color: rgba(255, 255, 255, 0.1); }
+        body { background-color: var(--black-bg); color: #f0f0f0; font-family: 'Montserrat', sans-serif; font-weight: 300; }
+        h1, h2, h3, h4, .serif-font { font-family: 'Playfair Display', serif; }
+        .text-gold-gradient { background: linear-gradient(to right, var(--gold-start), var(--gold-mid), var(--gold-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
+        
+        .header-spacer { height: 120px; }
+
+        /* Sipariş Kartı */
+        .order-card { 
+            background: var(--card-bg); 
+            border: 1px solid var(--border-color); 
+            border-radius: 4px; 
+            padding: 25px; 
+            margin-bottom: 20px;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .order-card:hover { border-color: var(--gold-mid); background: rgba(255,255,255,0.05); transform: translateY(-3px); }
+        .order-card::before { content: ""; position: absolute; left: 0; top: 0; height: 100%; width: 3px; background: var(--gold-mid); opacity: 0; transition: 0.3s; }
+        .order-card:hover::before { opacity: 1; }
+
+        /* Durum Badge */
+        .status-badge { font-size: 0.7rem; padding: 6px 12px; border-radius: 2px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; display: inline-block; }
+        .bg-hazirlaniyor { background: rgba(255, 193, 7, 0.15); color: #ffc107; border: 1px solid rgba(255, 193, 7, 0.3); }
+        .bg-kargolandi { background: rgba(25, 135, 84, 0.15); color: #198754; border: 1px solid rgba(25, 135, 84, 0.3); }
+        .bg-tamamlandi { background: rgba(13, 202, 240, 0.15); color: #0dcaf0; border: 1px solid rgba(13, 202, 240, 0.3); }
+
+        .btn-gold-outline { color: var(--gold-mid); border: 1px solid var(--gold-mid); padding: 8px 20px; font-size: 0.8rem; text-decoration: none; display: inline-block; transition: 0.3s; }
+        .btn-gold-outline:hover { background: var(--gold-mid); color: #000; }
+
+        /* --- DETAY MODAL TASARIMI --- */
+        .modal-content { background: #111; border: 1px solid #333; color: #fff; }
+        .modal-header { border-bottom: 1px solid #222; }
+        .modal-footer { border-top: 1px solid #222; }
+        .detail-label { color: #888; font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .detail-value { font-size: 0.95rem; color: #fff; margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 10px; }
+        .detail-value.highlight { color: var(--gold-mid); font-weight: 600; border-bottom: none; font-family: 'Playfair Display', serif; font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+
+    <nav id="mainNav"></nav>
+    <div class="header-spacer"></div>
+
+    <div class="container py-5" style="min-height: 60vh;">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="d-flex justify-content-between align-items-end mb-5 border-bottom border-secondary pb-3">
+                    <div>
+                        <span class="text-secondary small letter-spacing-2">HESABIM</span>
+                        <h2 class="text-white serif-font mt-2">Sipariş Geçmişi</h2>
+                    </div>
+                    <div class="text-gold-gradient fw-bold" id="welcomeMsg"></div>
+                </div>
+
+                <div id="orderListArea">
+                    <div class="text-center py-5 text-muted">
+                        <i data-feather="loader" class="spin mb-3"></i>
+                        <p>Siparişleriniz yükleniyor...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="detailModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title serif-font text-white">Sipariş Özeti <span class="text-secondary small ms-2" id="mId"></span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="text-center mb-4">
+                        <i data-feather="package" style="width: 40px; height: 40px; color: var(--gold-mid);"></i>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-6">
+                            <span class="detail-label">SİPARİŞ TARİHİ</span>
+                            <div class="detail-value" id="mDate">...</div>
+                        </div>
+                        <div class="col-6">
+                            <span class="detail-label">DURUM</span>
+                            <div id="mStatus">...</div>
+                        </div>
+                    </div>
+
+                    <span class="detail-label">ÜRÜN</span>
+                    <div class="detail-value" id="mProduct">...</div>
+
+                    <div class="row mt-2">
+                        <div class="col-6">
+                            <span class="detail-label">ÖDEME YÖNTEMİ</span>
+                            <div class="detail-value" id="mPayment">...</div>
+                        </div>
+                        <div class="col-6">
+                            <span class="detail-label">TOPLAM TUTAR</span>
+                            <div class="detail-value highlight" id="mPrice">...</div>
+                        </div>
+                    </div>
+
+                    <span class="detail-label">TESLİMAT ADRESİ</span>
+                    <div class="detail-value border-0" id="mAddress" style="line-height: 1.6; color: #ccc;">...</div>
+                </div>
+                <div class="modal-footer justify-content-center border-0 pb-4">
+                    <button type="button" class="btn btn-outline-light px-5 rounded-0" data-bs-dismiss="modal">KAPAT</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer id="mainFooter"></footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        feather.replace();
+
+        window.onload = function() {
+            // 1. Giriş Kontrolü
+            const activeUser = JSON.parse(localStorage.getItem("saaturn_user"));
+            
+            if (!activeUser) {
+                alert("Siparişlerinizi görmek için önce giriş yapmalısınız.");
+                window.location.href = "login.html";
+                return;
+            }
+
+            document.getElementById("welcomeMsg").innerText = `Sn. ${activeUser.ad.toUpperCase()} ${activeUser.soyad.toUpperCase()}`;
+
+            // 2. Siparişleri Listele
+            siparisleriListele(activeUser.email);
+        };
+
+        function siparisleriListele(userEmail) {
+            const tumSiparisler = JSON.parse(localStorage.getItem("saaturnSiparisleri")) || [];
+            const container = document.getElementById("orderListArea");
+            
+            // Kullanıcıya ait siparişleri filtrele
+            const benimSiparislerim = tumSiparisler.filter(order => order.email === userEmail);
+
+            container.innerHTML = "";
+
+            if (benimSiparislerim.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-5 border border-secondary rounded" style="background: rgba(255,255,255,0.02);">
+                        <i data-feather="shopping-bag" style="width:48px; height:48px; color:#333; margin-bottom:15px;"></i>
+                        <h4 class="text-white fw-light">Henüz bir siparişiniz bulunmuyor.</h4>
+                        <p class="text-secondary mb-4 small">Koleksiyonumuza göz atarak hemen alışverişe başlayabilirsiniz.</p>
+                        <a href="urunler.html" class="btn-gold-outline">KOLEKSİYONU KEŞFET</a>
+                    </div>
+                `;
+                feather.replace();
+                return;
+            }
+
+            // Siparişleri Listele (En yeni en üstte)
+            benimSiparislerim.reverse().forEach(order => {
+                let badgeClass = "bg-hazirlaniyor";
+                if(order.durum === "Kargolandı") badgeClass = "bg-kargolandi";
+                if(order.durum === "Tamamlandı") badgeClass = "bg-tamamlandi";
+
+                const html = `
+                <div class="order-card">
+                    <div class="row align-items-center">
+                        <div class="col-md-2 text-center text-md-start mb-3 mb-md-0">
+                            <div class="text-secondary small mb-1" style="font-size:0.7rem;">TARİH</div>
+                            <div class="text-white small">${order.tarih}</div>
+                        </div>
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <div class="text-secondary small mb-1" style="font-size:0.7rem;">ÜRÜN DETAYI</div>
+                            <div class="text-white fw-bold text-truncate">${order.urun}</div>
+                            <div class="text-secondary small">#${order.id}</div>
+                        </div>
+                        <div class="col-md-2 text-center mb-3 mb-md-0">
+                            <div class="text-secondary small mb-1" style="font-size:0.7rem;">TUTAR</div>
+                            <div class="text-warning">${order.fiyat}</div>
+                        </div>
+                        <div class="col-md-2 text-center mb-3 mb-md-0">
+                            <div class="text-secondary small mb-1" style="font-size:0.7rem;">DURUM</div>
+                            <span class="status-badge ${badgeClass}">${order.durum}</span>
+                        </div>
+                        <div class="col-md-2 text-center text-md-end">
+                            <button class="btn btn-sm btn-outline-light rounded-0 px-3" onclick="detayModalAc(${order.id})">DETAY</button>
+                        </div>
+                    </div>
+                </div>
+                `;
+                container.innerHTML += html;
+            });
+            feather.replace();
+        }
+
+        // --- YENİ DETAY FONKSİYONU ---
+        function detayModalAc(id) {
+            const tumSiparisler = JSON.parse(localStorage.getItem("saaturnSiparisleri"));
+            const order = tumSiparisler.find(x => x.id == id);
+
+            if(order) {
+                // Modal İçeriğini Doldur
+                document.getElementById('mId').innerText = "#" + order.id;
+                document.getElementById('mDate').innerText = order.tarih;
+                document.getElementById('mProduct').innerText = order.urun;
+                document.getElementById('mPrice').innerText = order.fiyat;
+                document.getElementById('mPayment').innerText = order.odeme || "Kredi Kartı";
+                document.getElementById('mAddress').innerText = order.adres;
+
+                // Durum Rengi
+                let badgeClass = "bg-hazirlaniyor";
+                if(order.durum === "Kargolandı") badgeClass = "bg-kargolandi";
+                if(order.durum === "Tamamlandı") badgeClass = "bg-tamamlandi";
+                
+                document.getElementById('mStatus').innerHTML = `<span class="status-badge ${badgeClass}">${order.durum}</span>`;
+
+                // Modalı Aç
+                new bootstrap.Modal(document.getElementById('detailModal')).show();
+                feather.replace();
+            }
+        }
+    </script>
+    
+    <script src="assets/js/footer.js"></script>
+    <script src="assets/js/navbar.js"></script>
+</body>
+</html>

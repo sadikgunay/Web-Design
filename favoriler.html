@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Favorilerim | SAATÜRN</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+    
+    <style>
+        /* --- ORTAK LÜKS STİL --- */
+        :root { --gold-start: #BF953F; --gold-mid: #FCF6BA; --gold-end: #B38728; --black-bg: #050505; --card-bg: rgba(255, 255, 255, 0.03); --border-color: rgba(255, 255, 255, 0.1); }
+        body { background-color: var(--black-bg); color: #f0f0f0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; font-weight: 300; }
+        h1, h2, h3, h4, .serif-font { font-family: 'Playfair Display', serif; }
+        .text-gold-gradient { background: linear-gradient(to right, var(--gold-start), var(--gold-mid), var(--gold-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
+        .header-spacer { height: 120px; }
+
+        /* Ürün Kartı */
+        .product-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; padding: 40px 20px; position: relative; overflow: hidden; transition: 0.4s ease; height: 100%; }
+        .product-card:hover { transform: translateY(-10px); background: rgba(255,255,255,0.05); border-color: var(--gold-mid); }
+        .product-img { height: 250px; width: 100%; object-fit: contain; margin-bottom: 25px; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.6)); transition: 0.5s; }
+        .product-card:hover .product-img { transform: scale(1.08) rotate(-2deg); }
+        .price-tag { font-size: 1.4rem; color: #fff; opacity: 0.9; margin: 15px 0; font-weight: 400; }
+        
+        .btn-gold-outline { color: var(--gold-mid); border: 1px solid var(--gold-mid); padding: 12px 35px; letter-spacing: 2px; text-transform: uppercase; font-size: 0.8rem; transition: 0.3s; background: transparent; border-radius: 0; text-decoration: none; display: inline-block; }
+        .btn-gold-outline:hover { background: var(--gold-mid); color: #000; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); }
+
+        /* Favori Kaldır Butonu */
+        .btn-remove-fav {
+            position: absolute; top: 15px; right: 15px;
+            background: rgba(0,0,0,0.5); border: 1px solid #333;
+            color: #ff4444; width: 35px; height: 35px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.3s; cursor: pointer; z-index: 10;
+        }
+        .btn-remove-fav:hover { background: #ff4444; color: #fff; border-color: #ff4444; }
+
+        .empty-state { text-align: center; padding: 100px 0; opacity: 0.6; }
+        .show { animation: fadeIn 0.8s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+
+<body onload="initFavoriler()">
+
+    <nav id="mainNav"></nav>
+    <div class="header-spacer"></div>
+
+    <section class="text-center py-5">
+        <div class="container">
+            <span class="text-secondary" style="letter-spacing: 4px; font-size: 0.8rem;">KİŞİSEL LİSTENİZ</span>
+            <h1 class="display-4 text-white serif-font mb-4"> <span class="text-gold-gradient">Favorilerim</span></h1>
+        </div>
+    </section>
+
+    <section class="pb-5">
+        <div class="container">
+            <div class="row g-5" id="favoriListesiWrapper">
+                <!-- JS ile dolacak -->
+            </div>
+        </div>
+    </section>
+
+    <footer id="mainFooter"></footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function initFavoriler() {
+            feather.replace();
+            
+            // 1. Kullanıcı Kontrolü
+            const user = JSON.parse(localStorage.getItem("saaturn_user"));
+            const wrapper = document.getElementById('favoriListesiWrapper');
+
+            if (!user) {
+                wrapper.innerHTML = `
+                    <div class="col-12 empty-state">
+                        <i data-feather="lock" style="width: 50px; height: 50px; margin-bottom: 20px;"></i>
+                        <h3 class="serif-font">Giriş Yapmalısınız</h3>
+                        <p>Favorilerinizi görmek için lütfen hesabınıza giriş yapın.</p>
+                        <a href="login.html" class="btn-gold-outline mt-3">GİRİŞ YAP</a>
+                    </div>`;
+                feather.replace();
+                return;
+            }
+
+            // 2. Favori Listesini Çek (Kullanıcıya Özel Key: saaturn_favs_email)
+            const favKey = `saaturn_favs_${user.email}`;
+            const favIds = JSON.parse(localStorage.getItem(favKey)) || [];
+
+            if (favIds.length === 0) {
+                wrapper.innerHTML = `
+                    <div class="col-12 empty-state">
+                        <i data-feather="heart" style="width: 50px; height: 50px; margin-bottom: 20px;"></i>
+                        <h3 class="serif-font">Listeniz Boş</h3>
+                        <p>Henüz favori listenize ürün eklemediniz.</p>
+                        <a href="urunler.html" class="btn-gold-outline mt-3">KOLEKSİYONU KEŞFET</a>
+                    </div>`;
+                feather.replace();
+                return;
+            }
+
+            // 3. Tüm Ürünleri Çek ve Eşleşenleri Bul
+            const tumUrunler = JSON.parse(localStorage.getItem('saaturnUrunler')) || [];
+            const favoriUrunler = tumUrunler.filter(u => favIds.includes(u.id));
+
+            // 4. Ekrana Bas
+            wrapper.innerHTML = "";
+            favoriUrunler.forEach(u => {
+                let badgeHTML = u.badge ? `<span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3 rounded-0">${u.badge}</span>` : "";
+
+                const kart = `
+                <div class="col-12 col-md-6 col-lg-4 show">
+                    <div class="product-card">
+                        
+                        <!-- Kaldır Butonu -->
+                        <button class="btn-remove-fav" onclick="favCikar(${u.id})" title="Favorilerden Kaldır">
+                            <i data-feather="x"></i>
+                        </button>
+
+                        <div class="text-center mb-3 position-relative">
+                            ${badgeHTML}
+                            <img src="${u.img}" class="product-img" alt="${u.ad}">
+                        </div>
+                        <div class="text-center mt-4">
+                            <h4 class="text-white serif-font h4 mb-1">${u.ad}</h4>
+                            <p class="text-secondary small text-uppercase" style="letter-spacing: 1px;">${u.kat}</p>
+                            <div class="price-tag serif-font">${u.fiyat.toLocaleString()} ₺</div>
+                            <a href="urun-detay.html?id=${u.id}" class="btn-gold-outline mt-2 w-100 d-block">İNCELE</a>
+                        </div>
+                    </div>
+                </div>`;
+                wrapper.innerHTML += kart;
+            });
+            feather.replace();
+        }
+
+        function favCikar(id) {
+            const user = JSON.parse(localStorage.getItem("saaturn_user"));
+            if(!user) return;
+
+            const favKey = `saaturn_favs_${user.email}`;
+            let favIds = JSON.parse(localStorage.getItem(favKey)) || [];
+            
+            // ID'yi sil
+            favIds = favIds.filter(favId => favId !== id);
+            localStorage.setItem(favKey, JSON.stringify(favIds));
+            
+            // Sayfayı yenilemeden kutuyu silmek yerine init'i tekrar çağırarak listeyi güncelliyoruz
+            initFavoriler();
+        }
+    </script>
+</body>
+<script src="assets/js/footer.js"></script>
+<script src="assets/js/navbar.js"></script>
+</html>

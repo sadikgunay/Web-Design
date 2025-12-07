@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Yönetici Girişi | SAATÜRN</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+    
+    <style>
+        /* --- LÜKS GİRİŞ TASARIMI --- */
+        :root { --gold: #D4AF37; --black-bg: #000000; }
+        
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            background-color: var(--black-bg);
+            /* Arka plan resmi */
+            background-image: url('https://images.unsplash.com/photo-1547996160-81dfa63595aa?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover; 
+            background-position: center;
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Karartma Katmanı */
+        body::before {
+            content: "";
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.85); /* Çok koyu filtre */
+            backdrop-filter: blur(8px); 
+            z-index: 0;
+        }
+
+        h3 { font-family: 'Playfair Display', serif; letter-spacing: 1px; }
+
+        /* Giriş Kartı */
+        .login-card { 
+            position: relative; z-index: 2;
+            background: rgba(20, 20, 20, 0.8); /* Daha opak yapıldı okunabilirlik için */
+            border: 1px solid rgba(212, 175, 55, 0.3); 
+            backdrop-filter: blur(20px); 
+            border-radius: 15px; 
+            padding: 3rem; 
+            width: 90%; 
+            max-width: 400px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9); 
+            text-align: center;
+            margin: auto; 
+        }
+        
+        /* Form Elemanları - Yüksek Kontrast */
+        .form-control { 
+            background: #000 !important; 
+            border: 1px solid #444; 
+            color: #fff !important; 
+            border-radius: 50px; 
+            padding: 12px 20px; 
+            text-align: center;
+            transition: 0.3s;
+            margin-bottom: 15px;
+        }
+        .form-control:focus { 
+            background: #050505 !important; 
+            border-color: var(--gold); 
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2); 
+            outline: none;
+        }
+        .form-control::placeholder { color: #888; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+        
+        .btn-gold { 
+            background: linear-gradient(135deg, #D4AF37, #AA8C2C); 
+            color: #000; 
+            border: none; 
+            width: 100%; 
+            padding: 12px; 
+            font-weight: 700; 
+            letter-spacing: 2px; 
+            border-radius: 50px; 
+            margin-top: 10px; 
+            transition: 0.4s; 
+            cursor: pointer;
+        }
+        .btn-gold:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3); 
+            color: white;
+        }
+        
+        .logo-icon { color: var(--gold); width: 50px; height: 50px; margin-bottom: 15px; }
+        .error-msg { color: #ff4d4d; font-size: 0.85rem; margin-top: 15px; display: none; font-weight: bold; }
+        
+        .back-link { color: #888; text-decoration: none; font-size: 0.8rem; transition: 0.3s; }
+        .back-link:hover { color: var(--gold); }
+
+        .admin-footer {
+            position: relative; z-index: 2;
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 0.75rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            background: rgba(0,0,0,0.8);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-card">
+        <img src="assets/img/gallery/saatlogo.png" alt="SAATÜRN Logo" style="height: 60px; width: auto; margin-bottom: 10px;">
+        
+        <h3 class="text-white mb-1">YÖNETİM PANELİ</h3>
+        <p class="text-secondary small mb-4">Lütfen yetkili bilgilerinizi giriniz.</p>
+
+        <form id="loginForm" onsubmit="event.preventDefault(); girisKontrol();">
+            <div class="mb-3">
+                <input type="text" id="username" class="form-control" placeholder="Kullanıcı Adı (admin)" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" id="password" class="form-control" placeholder="Şifre (1234)" required>
+            </div>
+            
+            <button type="submit" class="btn-gold">GİRİŞ YAP</button>
+            
+            <div id="hataKutusu" class="error-msg">⛔ Hatalı kullanıcı adı veya şifre!</div>
+        </form>
+
+        <div class="mt-4 pt-3 border-top border-secondary" style="border-color: rgba(255,255,255,0.1) !important;">
+            <a href="index.html" class="back-link">← Mağazaya Dön</a>
+        </div>
+    </div>
+
+
+
+    <script>
+        feather.replace();
+
+        function girisKontrol() {
+            var kAd = document.getElementById("username").value;
+            var sifre = document.getElementById("password").value;
+            var btn = document.querySelector('.btn-gold');
+            var hata = document.getElementById("hataKutusu");
+            
+            // BASİT GÜVENLİK KONTROLÜ (Admin / 1234)
+            if (kAd === "admin" && sifre === "1234") {
+                // Başarılı Giriş Efekti
+                btn.innerHTML = "GİRİŞ YAPILIYOR...";
+                btn.style.background = "#28a745"; // Yeşil
+                btn.style.color = "white";
+                hata.style.display = "none";
+                
+                // Oturumu Kaydet
+                localStorage.setItem("saaturn_session", "active");
+                
+                // Yönlendir
+                setTimeout(function() {
+                    window.location.href = "admin-panel.html";
+                }, 800);
+            } else {
+                // Hata Göster
+                hata.style.display = "block";
+                
+                // Şifreyi Temizle
+                document.getElementById("password").value = "";
+                
+                // Butonu Kırmızı Yap (Uyarı)
+                var originalText = btn.innerHTML;
+                btn.style.background = "#dc3545";
+                btn.innerHTML = "HATALI!";
+                setTimeout(() => {
+                    btn.style.background = "linear-gradient(135deg, #D4AF37, #AA8C2C)";
+                    btn.innerHTML = originalText;
+                }, 1000);
+            }
+        }
+    </script>
+</body>
+
+</html>

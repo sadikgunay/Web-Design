@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>İletişim | SAATÜRN Concierge</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <style>
+        /* --- ULTRA PREMIUM PALET --- */
+        :root { 
+            --gold: #D4AF37; 
+            --gold-dim: #8a701e;
+            --black: #050505; 
+            --panel-dark: #0e0e0e; 
+            --text-muted: #888;
+        }
+        
+        body { 
+            background-color: var(--black); 
+            color: #e0e0e0; 
+            font-family: 'Montserrat', sans-serif; 
+            padding-top: 100px; /* Navbar için boşluk */
+            min-height: 100vh;
+            background-image: radial-gradient(circle at center, #151515 0%, #000000 100%);
+        }
+
+        h1, h2, h3, h4, .serif-font { font-family: 'Playfair Display', serif; }
+        
+        /* --- ANA KART YAPISI --- */
+        .contact-section { padding: 60px 0; }
+
+        .luxury-card {
+            background: var(--panel-dark);
+            border: 1px solid #222;
+            border-radius: 4px;
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.05);
+            display: flex;
+            flex-wrap: wrap;
+            overflow: hidden;
+        }
+
+        /* SOL: Bilgi Alanı */
+        .info-panel {
+            background: #0a0a0a;
+            padding: 60px 40px;
+            border-right: 1px solid #222;
+            position: relative;
+        }
+        .info-panel::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+            background: linear-gradient(to bottom, var(--gold), #000);
+        }
+
+        .info-group { margin-bottom: 40px; }
+        .info-label { 
+            color: var(--gold); 
+            font-size: 0.7rem; 
+            letter-spacing: 3px; 
+            text-transform: uppercase; 
+            display: block; 
+            margin-bottom: 10px; 
+            opacity: 0.8;
+        }
+        .info-content { color: #fff; font-size: 1.1rem; font-weight: 300; line-height: 1.6; }
+        
+        /* Harita - ÖZELLEŞTİRİLMİŞ */
+        .map-box {
+            width: 100%; height: 250px;
+            border: 1px solid #333;
+            margin-top: 20px;
+            /* Haritayı siyah beyaz yapar */
+            filter: grayscale(100%) invert(92%) contrast(83%);
+            transition: 0.5s;
+        }
+        /* Fare gelince renklenir */
+        .map-box:hover { filter: grayscale(0%); border-color: var(--gold); }
+
+        /* SAĞ: Form Alanı */
+        .form-panel {
+            background: #111;
+            padding: 60px 50px;
+            flex: 1;
+        }
+
+        .form-header h2 { font-size: 3rem; color: #fff; margin-bottom: 10px; }
+        .form-header p { color: #666; font-size: 0.9rem; margin-bottom: 30px; letter-spacing: 0.5px; }
+
+        /* Otomatik Doldur Butonu */
+        .btn-autofill {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px dashed var(--gold);
+            color: var(--gold);
+            font-size: 0.75rem;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 30px;
+            display: none; 
+            transition: 0.3s;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-autofill:hover { background: var(--gold); color: #000; }
+
+        /* Form Elemanları */
+        .form-group { margin-bottom: 35px; position: relative; }
+        
+        .custom-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #333;
+            padding: 15px 0;
+            color: #fff; 
+            font-size: 1rem;
+            font-family: 'Montserrat', sans-serif;
+            transition: 0.4s;
+            border-radius: 0;
+        }
+
+        .custom-input::placeholder { 
+            color: #666; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; opacity: 1; 
+        }
+
+        .custom-input:focus {
+            outline: none;
+            border-bottom-color: var(--gold);
+            background: linear-gradient(to top, rgba(212, 175, 55, 0.05), transparent);
+        }
+        .custom-input:focus::placeholder { color: var(--gold); }
+
+        select.custom-input option { background: #000; color: #fff; padding: 10px; }
+
+        /* Gönder Butonu */
+        .btn-luxury {
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            padding: 18px 50px;
+            font-size: 0.85rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 600;
+            width: 100%;
+            transition: 0.4s;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .btn-luxury:hover {
+            background: var(--gold);
+            color: #000;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+        }
+
+        @media (max-width: 991px) {
+            .info-panel { border-right: none; border-bottom: 1px solid #222; padding: 40px 20px; }
+            .form-panel { padding: 40px 20px; }
+            .form-header h2 { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav id="mainNav"></nav>
+
+    <div class="container contact-section">
+        <div class="row justify-content-center">
+            <div class="col-xl-11">
+                
+                <div class="luxury-card">
+                    
+                    <div class="col-lg-5 info-panel">
+                        <h3 class="serif-font text-white mb-5">Merkez Ofis</h3>
+                        
+                        <div class="info-group">
+                            <span class="info-label">ADRES</span>
+                            <p class="info-content">
+                                Kocaeli Üniversitesi<br>
+                                Teknoloji Fakültesi<br>
+                                Umuttepe Kampüsü / İZMİT
+                            </p>
+                        </div>
+
+                        <div class="info-group">
+                            <span class="info-label">İLETİŞİM</span>
+                            <p class="info-content text-warning">0 (262) 303 10 00</p>
+                            <p class="info-content" style="font-size: 0.9rem;">info@saaturn.com</p>
+                        </div>
+
+                        <div class="info-group">
+                            <span class="info-label">ÇALIŞMA SAATLERİ</span>
+                            <div class="d-flex justify-content-between text-secondary small" style="max-width: 200px;">
+                                <span>Pzt - Cum</span><span>09:00 - 18:00</span>
+                            </div>
+                            <div class="d-flex justify-content-between text-secondary small" style="max-width: 200px;">
+                                <span>Cumartesi</span><span>10:00 - 14:00</span>
+                            </div>
+                        </div>
+
+                        <div class="map-box">
+                            <iframe 
+                                width="100%" 
+                                height="100%" 
+                                frameborder="0" 
+                                scrolling="no" 
+                                marginheight="0" 
+                                marginwidth="0" 
+                                src="https://maps.google.com/maps?q=Kocaeli%20%C3%9Cniversitesi%20Teknoloji%20Fak%C3%BCltesi&t=&z=15&ie=UTF8&iwloc=&output=embed">
+                            </iframe>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-7 form-panel">
+                        <div class="form-header">
+                            <h2 class="serif-font">İletişim Servisi</h2>
+                            <p>Size özel danışmanlık ve sipariş talepleriniz için formu doldurabilirsiniz.</p>
+                        </div>
+
+                        <button id="btnAutoFill" class="btn-autofill" onclick="bilgileriDoldur()">
+                            <i data-feather="user" style="width:14px; margin-right:5px;"></i>
+                            <span id="userNameDisplay">Kullanıcı</span> bilgilerimi kullan
+                        </button>
+
+                        <form id="contactForm" onsubmit="event.preventDefault(); formGonder();">
+                            <div class="row">
+                                <div class="col-md-6 form-group">
+                                    <input type="text" id="isim" class="custom-input" placeholder="ADINIZ" required>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <input type="text" id="soyisim" class="custom-input" placeholder="SOYADINIZ" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <input type="email" id="email" class="custom-input" placeholder="E-POSTA ADRESİNİZ" required>
+                            </div>
+
+                            <div class="form-group">
+                                <select id="konu" class="custom-input">
+                                    <option value="" disabled selected>KONU SEÇİNİZ</option>
+                                    <option value="Sipariş">Özel Sipariş & Stok</option>
+                                    <option value="Teknik">Teknik Servis & Bakım</option>
+                                    <option value="Bilgi">Ürün Hakkında Bilgi</option>
+                                    <option value="Diğer">Şikayet ve Öneri</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <textarea id="mesaj" class="custom-input" rows="3" placeholder="MESAJINIZ" required></textarea>
+                            </div>
+
+                            <button type="submit" id="btnGonder" class="btn-luxury">GÖNDER</button>
+                        </form>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <footer id="mainFooter"></footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        feather.replace();
+        let aktifUye = null;
+
+        // Sayfa yüklendiğinde kullanıcı kontrolü
+        window.onload = function() {
+            aktifUye = JSON.parse(localStorage.getItem('saaturn_user'));
+            if(aktifUye) {
+                document.getElementById('btnAutoFill').style.display = 'block';
+                document.getElementById('userNameDisplay').innerText = aktifUye.ad;
+            }
+        };
+
+        // Bilgileri otomatik doldurma
+        function bilgileriDoldur() {
+            if(aktifUye) {
+                document.getElementById('isim').value = aktifUye.ad;
+                document.getElementById('soyisim').value = aktifUye.soyad;
+                document.getElementById('email').value = aktifUye.email;
+                
+                const btn = document.getElementById('btnAutoFill');
+                btn.innerHTML = "✅ Bilgileriniz Getirildi!";
+                btn.style.color = "#4CAF50";
+                btn.style.borderColor = "#4CAF50";
+                
+                setTimeout(() => {
+                    btn.style.display = 'none'; // Butonu gizle
+                }, 1500);
+            }
+        }
+
+        function formGonder() {
+            const btn = document.getElementById('btnGonder');
+            const originalText = btn.innerText;
+            
+            btn.innerText = "GÖNDERİLİYOR...";
+            btn.style.color = "#fff";
+            btn.style.borderColor = "#fff";
+            btn.style.opacity = "0.7";
+            
+            setTimeout(() => {
+                const yeniMesaj = {
+                    isim: document.getElementById('isim').value + ' ' + document.getElementById('soyisim').value,
+                    konu: document.getElementById('konu').value || "Genel",
+                    email: document.getElementById('email').value,
+                    mesaj: document.getElementById('mesaj').value,
+                    tarih: new Date().toLocaleDateString('tr-TR'),
+                    durum: 'Okunmadı'
+                };
+                
+                const mesajlar = JSON.parse(localStorage.getItem('saaturnRandevular')) || [];
+                mesajlar.push(yeniMesaj);
+                localStorage.setItem('saaturnRandevular', JSON.stringify(mesajlar));
+
+                btn.innerText = "TALEBİNİZ ALINDI";
+                btn.style.background = "#fff";
+                btn.style.color = "#000";
+                btn.style.borderColor = "#fff";
+                btn.style.opacity = "1";
+                
+                document.getElementById('contactForm').reset();
+                
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.background = "transparent";
+                    btn.style.color = "var(--gold)";
+                    btn.style.borderColor = "var(--gold)";
+                }, 3000);
+            }, 1500);
+        }
+    </script>
+    
+    <script src="assets/js/footer.js"></script>
+    <script src="assets/js/navbar.js"></script>
+</body>
+</html>

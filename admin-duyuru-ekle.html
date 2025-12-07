@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Duyuru Yönetimi | SAATÜRN Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+    
+    <script>
+        if(localStorage.getItem("saaturn_session") !== "active") {
+            window.location.href = "admin-login.html";
+        }
+    </script>
+
+    <style>
+        /* --- GENEL TEMA --- */
+        :root { --gold: #D4AF37; --dark: #050505; --panel: #111; }
+        body { background-color: var(--dark); color: #e0e0e0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
+        
+        /* Sidebar (Masaüstü) */
+        .sidebar { 
+            background: #000; border-right: 1px solid #222; min-height: 100vh; 
+            position: fixed; top: 0; left: 0; width: 250px; padding-top: 30px; 
+            z-index: 1000; transition: transform 0.3s ease-in-out;
+        }
+        .nav-link { color: #bbb; padding: 12px 20px; display: flex; align-items: center; transition: 0.3s; text-decoration: none; }
+        .nav-link:hover, .nav-link.active { color: var(--gold); background: rgba(212, 175, 55, 0.05); border-right: 3px solid var(--gold); }
+        .nav-link svg { margin-right: 12px; width: 18px; }
+        
+        .main-content { margin-left: 250px; padding: 40px; transition: margin-left 0.3s ease-in-out; }
+        
+        /* Mobil Menü Butonu */
+        .mobile-toggle-btn {
+            display: none; position: fixed; top: 15px; left: 15px; z-index: 1100;
+            background: var(--gold); border: none; padding: 8px; border-radius: 4px; color: #000;
+        }
+
+        /* Kartlar ve Formlar */
+        .card-custom { background: var(--panel); border: 1px solid #222; border-radius: 12px; height: 100%; margin-bottom: 20px; }
+        .form-control, .form-select { background-color: #000 !important; border: 1px solid #333; color: #fff !important; }
+        .form-control:focus, .form-select:focus { border-color: var(--gold); box-shadow: none; }
+        
+        /* Dosya Yükleme Alanı */
+        .file-drop-area { 
+            border: 2px dashed #444; padding: 20px; text-align: center; border-radius: 8px; 
+            cursor: pointer; transition: 0.3s; background: #0a0a0a;
+        }
+        .file-drop-area:hover { border-color: var(--gold); background: #111; }
+        
+        /* Tablo */
+        .table-custom { --bs-table-bg: var(--panel); border: 1px solid #222; color: #ccc; margin-top: 0; }
+        .table-custom th { border-bottom: 1px solid #333; color: var(--gold); font-weight: normal; white-space: nowrap; }
+        .table-custom td { border-bottom: 1px solid #222; color: #ddd; vertical-align: middle; }
+
+        /* --- RESPONSIVE AYARLAR --- */
+        @media (max-width: 991px) {
+            .sidebar { transform: translateX(-100%); } /* Gizle */
+            .sidebar.show { transform: translateX(0); } /* Göster */
+            
+            .main-content { margin-left: 0; padding: 20px; padding-top: 70px; } /* Buton payı */
+            
+            .mobile-toggle-btn { display: block; }
+            
+            .col-lg-5, .col-lg-7 { width: 100%; } /* Alt alta dizilim */
+        }
+    </style>
+</head>
+<body onload="tabloyuGuncelle()">
+
+    <!-- MOBİL MENÜ BUTONU -->
+    <button class="mobile-toggle-btn" onclick="toggleSidebar()">
+        <i data-feather="menu"></i>
+    </button>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="text-center mb-5">
+            <h4 class="text-warning fw-bold pt-2">SAATÜRN</h4>
+            <small class="text-muted">YÖNETİCİ PANELİ</small>
+            <!-- Mobilde Kapat Butonu -->
+            <button class="btn btn-sm btn-outline-secondary d-lg-none position-absolute top-0 end-0 m-3" onclick="toggleSidebar()">X</button>
+        </div>
+        <div class="d-flex flex-column">
+            <a href="admin-panel.html" class="nav-link"><span data-feather="grid"></span> Genel Bakış</a>
+            <a href="admin-urunler.html" class="nav-link"><span data-feather="box"></span> Ürün Yönetimi</a>
+            <a href="admin-duyuru-ekle.html" class="nav-link active"><span data-feather="edit"></span> Duyuru Yönetimi</a>
+            <a href="istatistik.html" class="nav-link"><span data-feather="pie-chart"></span> İstatistikler</a>
+            <div class="mt-5 border-top border-secondary pt-3">
+                <a href="index.html" class="nav-link"><span data-feather="external-link"></span> Siteye Git</a>
+                <a href="#" onclick="cikisYap()" class="nav-link text-danger"><span data-feather="log-out"></span> Çıkış Yap</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <!-- Başlık Alanı -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+            <h3 class="fw-bold text-white m-0">Duyuru Yönetimi</h3>
+            <button class="btn btn-outline-warning btn-sm" onclick="varsayilanlariYukle()">
+                <i data-feather="rotate-ccw" style="width:14px;"></i> Varsayılanları Yükle
+            </button>
+        </div>
+        
+        <div class="row g-4">
+            <!-- Form Alanı -->
+            <div class="col-lg-5">
+                <div class="card-custom p-4">
+                    <h5 class="text-white mb-4 border-bottom border-secondary pb-2">Yeni Duyuru Ekle</h5>
+                    <form id="duyuruForm">
+                        <div class="mb-3">
+                            <label class="text-warning small fw-bold">BAŞLIK</label>
+                            <input type="text" id="duyuruBaslik" class="form-control" placeholder="Duyuru başlığı..." required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="text-warning small fw-bold">İÇERİK</label>
+                            <textarea id="duyuruIcerik" class="form-control" rows="4" placeholder="Duyuru detayları..." required></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="text-warning small fw-bold">ETİKET</label>
+                            <select id="duyuruEtiket" class="form-select">
+                                <option value="GENEL">📢 Genel</option>
+                                <option value="ACİL">🚨 ACİL (Pop-up)</option>
+                                <option value="İNDİRİM">🏷️ İndirim</option>
+                                <option value="KAMPANYA">🎁 Kampanya</option>
+                                <option value="ÖNEMLİ">⭐ Önemli</option>
+                                <option value="YENİ">✨ Yeni Ürün</option>
+                                <option value="SERVİS">🛠️ Teknik Servis</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="text-warning small fw-bold mb-2">EK DOSYA / GÖRSEL</label>
+                            <div class="file-drop-area" onclick="document.getElementById('duyuruDosya').click()">
+                                <i data-feather="upload-cloud" class="text-secondary mb-2"></i>
+                                <div id="dosyaBilgi" class="small text-muted">Resim (JPG, PNG), PDF veya Word belgesi seçin</div>
+                                <input type="file" id="duyuruDosya" style="display:none;" onchange="dosyaSecildi(this)" accept=".jpg,.png,.jpeg,.pdf,.doc,.docx">
+                            </div>
+                            <input type="hidden" id="dosyaTipi" value="">
+                            <input type="hidden" id="dosyaData" value="">
+                        </div>
+                        
+                        <button type="button" class="btn btn-warning w-100 fw-bold" onclick="duyuruKaydet()">YAYINLA</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Liste Alanı -->
+            <div class="col-lg-7">
+                <div class="card-custom p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom border-secondary pb-2">
+                        <h5 class="text-white m-0">Yayındaki Duyurular</h5>
+                        <span class="badge bg-secondary" id="duyuruSayisi">0</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-custom table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ETİKET</th>
+                                    <th>BAŞLIK</th>
+                                    <th>DOSYA TİPİ</th>
+                                    <th class="text-end">İŞLEM</th>
+                                </tr>
+                            </thead>
+                            <tbody id="duyuruTablosu"></tbody>
+                        </table>
+                        <div id="bosUyari" class="text-center p-5 text-muted" style="display:none;">Henüz duyuru yok.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        feather.replace();
+
+        // Mobil Sidebar Toggle
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('show');
+        }
+
+        function dosyaSecildi(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+                
+                let tip = "Diğer";
+                if(file.type.includes("image")) tip = "Resim";
+                else if(file.type.includes("pdf")) tip = "PDF";
+                else if(file.type.includes("word") || file.name.endsWith(".doc") || file.name.endsWith(".docx")) tip = "Word";
+                
+                document.getElementById('dosyaTipi').value = tip;
+                document.getElementById('dosyaBilgi').innerText = `✅ ${file.name} (${tip})`;
+                document.getElementById('dosyaBilgi').style.color = "#D4AF37";
+
+                reader.onload = function(e) {
+                    document.getElementById('dosyaData').value = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function duyuruKaydet() {
+            const baslik = document.getElementById('duyuruBaslik').value;
+            const icerik = document.getElementById('duyuruIcerik').value;
+            const etiket = document.getElementById('duyuruEtiket').value;
+            const dosyaData = document.getElementById('dosyaData').value;
+            const dosyaTipi = document.getElementById('dosyaTipi').value;
+            const dosyaAdi = document.getElementById('duyuruDosya').files[0] ? document.getElementById('duyuruDosya').files[0].name : "";
+
+            if(baslik === "" || icerik === "") {
+                alert("Başlık ve içerik zorunludur.");
+                return;
+            }
+
+            const yeniDuyuru = {
+                id: Date.now(),
+                baslik: baslik,
+                icerik: icerik,
+                etiket: etiket,
+                tarih: new Date().toLocaleDateString('tr-TR'),
+                dosyaData: dosyaData,
+                dosyaTipi: dosyaTipi,
+                dosyaAdi: dosyaAdi
+            };
+
+            const liste = JSON.parse(localStorage.getItem('saaturnDuyurular')) || [];
+            liste.unshift(yeniDuyuru);
+            localStorage.setItem('saaturnDuyurular', JSON.stringify(liste));
+
+            document.getElementById('duyuruForm').reset();
+            document.getElementById('dosyaBilgi').innerText = "Resim (JPG, PNG), PDF veya Word belgesi seçin";
+            document.getElementById('dosyaBilgi').style.color = "#6c757d";
+            document.getElementById('dosyaData').value = "";
+            document.getElementById('dosyaTipi').value = "";
+            
+            tabloyuGuncelle();
+            alert("✅ Duyuru başarıyla yayınlandı!");
+        }
+
+        function tabloyuGuncelle() {
+            const liste = JSON.parse(localStorage.getItem('saaturnDuyurular')) || [];
+            const tablo = document.getElementById('duyuruTablosu');
+            const uyari = document.getElementById('bosUyari');
+            
+            tablo.innerHTML = "";
+            document.getElementById('duyuruSayisi').innerText = liste.length;
+
+            if (liste.length > 0) {
+                uyari.style.display = 'none';
+                liste.forEach((d, index) => {
+                    let ikon = "-";
+                    if(d.dosyaTipi === "Resim") ikon = "📷 Resim";
+                    else if(d.dosyaTipi === "PDF") ikon = "📄 PDF";
+                    else if(d.dosyaTipi === "Word") ikon = "📝 Word";
+
+                    tablo.innerHTML += `
+                        <tr>
+                            <td><span class="badge bg-secondary text-nowrap">${d.etiket}</span></td>
+                            <td class="text-white fw-bold">${d.baslik}</td>
+                            <td class="small text-warning text-nowrap">${ikon}</td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-danger" onclick="sil(${index})"><i data-feather="trash-2" style="width:14px;"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                feather.replace();
+            } else {
+                uyari.style.display = 'block';
+            }
+        }
+
+        function sil(index) {
+            if(confirm("Silmek istediğinize emin misiniz?")) {
+                const liste = JSON.parse(localStorage.getItem('saaturnDuyurular'));
+                liste.splice(index, 1);
+                localStorage.setItem('saaturnDuyurular', JSON.stringify(liste));
+                tabloyuGuncelle();
+            }
+        }
+
+        function varsayilanlariYukle() {
+            if(confirm("Mevcut duyurular silinecek ve 5 adet örnek duyuru yüklenecek. Onaylıyor musunuz?")) {
+                const varsayilanlar = [
+                    {
+                        id: 1, baslik: "Yeni Koleksiyon: NEBULA Serisi Tanıtıldı", icerik: "Uzay çağı tasarımı...", tarih: "06.12.2025", etiket: "YENİ", dosyaTipi: "Resim", dosyaData: "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?q=80&w=600&auto=format&fit=crop", dosyaAdi: "nebula-launch.jpg"
+                    },
+                    {
+                        id: 2, baslik: "Bahar Sezonu İndirim Fırsatları", icerik: "%20 indirim...", tarih: "01.12.2025", etiket: "İNDİRİM", dosyaTipi: "", dosyaData: "", dosyaAdi: ""
+                    },
+                    {
+                        id: 3, baslik: "Cenevre Saat Fuarı'ndayız", icerik: "Standımızı ziyaret edin...", tarih: "20.11.2025", etiket: "GENEL", dosyaTipi: "Resim", dosyaData: "https://images.unsplash.com/photo-1565514020176-dbf2277800c2?q=80&w=600&auto=format&fit=crop", dosyaAdi: "fair-stand.jpg"
+                    },
+                    {
+                        id: 4, baslik: "2025 Fiyat Listesi Güncellemesi", icerik: "Güncel fiyatlar...", tarih: "15.11.2025", etiket: "ÖNEMLİ", dosyaTipi: "PDF", dosyaData: "#", dosyaAdi: "2025_Fiyat_Listesi.pdf"
+                    },
+                    {
+                        id: 5, baslik: "Teknik Servis Bakım Günleri", icerik: "Ücretsiz kontrol...", tarih: "10.11.2025", etiket: "SERVİS", dosyaTipi: "", dosyaData: "", dosyaAdi: ""
+                    }
+                ];
+
+                localStorage.setItem('saaturnDuyurular', JSON.stringify(varsayilanlar));
+                tabloyuGuncelle();
+                alert("✅ Varsayılan 5 duyuru başarıyla yüklendi!");
+            }
+        }
+
+        function cikisYap() {
+            localStorage.removeItem("saaturn_session");
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>

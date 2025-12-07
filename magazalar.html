@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mağazalarımız | SAATÜRN</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <style>
+        :root {
+            --bg-dark: #090909;
+            --card-bg: #111111;
+            --gold: #D4AF37;
+            --gold-gradient: linear-gradient(135deg, #D4AF37 0%, #AA8A25 100%);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            position: relative;
+            height: 60vh;
+            min-height: 400px;
+            /* Arka plan görseli */
+            background: url('assets/img/gallery/store-bg.png') center/cover no-repeat; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            margin-top: -100px; /* Navbar'ın altına girmesi için */
+            padding-top: 100px;
+        }
+        .hero-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.6), #090909);
+        }
+        .hero-content { position: relative; z-index: 2; max-width: 800px; padding: 0 20px; }
+        .hero-title { font-family: 'Playfair Display', serif; font-size: 3.5rem; color: #fff; margin-bottom: 15px; letter-spacing: 2px; }
+        .hero-subtitle { font-size: 1.1rem; color: #ddd; font-weight: 300; }
+
+        /* Store Cards */
+        .store-card {
+            background: var(--card-bg); border: 1px solid #222; transition: all 0.4s ease;
+            height: 100%; display: flex; flex-direction: column; overflow: hidden;
+        }
+        .store-card:hover { transform: translateY(-10px); border-color: var(--gold); }
+        
+        .store-img-wrapper { height: 250px; overflow: hidden; }
+        .store-img { width: 100%; height: 100%; object-fit: cover; transition: 0.8s ease; }
+        .store-card:hover .store-img { transform: scale(1.05); }
+        
+        .store-body { padding: 30px; flex-grow: 1; display: flex; flex-direction: column; }
+        .store-city { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--gold); margin-bottom: 5px; }
+        .store-district { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: #555; margin-bottom: 20px; font-weight: 600; }
+        .store-info { color: #aaa; font-size: 0.9rem; line-height: 1.7; margin-bottom: 20px; }
+        
+        .store-services { margin-top: auto; margin-bottom: 25px; display: flex; gap: 5px; flex-wrap: wrap; }
+        .service-badge { font-size: 0.7rem; padding: 5px 10px; border: 1px solid #333; color: #888; }
+
+        .btn-gold-outline {
+            border: 1px solid var(--gold); color: var(--gold); padding: 10px 0; text-align: center;
+            text-decoration: none; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px;
+            transition: 0.3s; display: block; width: 100%;
+        }
+        .btn-gold-outline:hover { background: var(--gold); color: #000; font-weight: 600; }
+
+        @media (max-width: 768px) { .hero-title { font-size: 2.5rem; } }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR (Dinamik Yüklenecek) -->
+    <nav id="mainNav"></nav>
+
+    <section class="hero-section">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">Mağazalarımız</h1>
+            <p class="hero-subtitle">
+                SAATÜRN'ün zamansız dünyasına adım atın. Küresel standartlardaki mağaza konseptimiz ve kişisel alışveriş asistanlarımızla tanışın.
+            </p>
+        </div>
+    </section>
+
+    <div class="container" style="margin-top: -60px; position: relative; z-index: 5; padding-bottom: 80px;">
+        <div class="row g-5">
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="store-card">
+                    <div class="store-img-wrapper">
+                        <img src="assets/img/gallery/dukkan2.jpg" class="store-img" alt="Nişantaşı">
+                    </div>
+                    <div class="store-body">
+                        <span class="store-district">FLAGSHIP STORE</span>
+                        <h3 class="store-city">Nişantaşı</h3>
+                        <div class="store-info">
+                            <p>Abdi İpekçi Caddesi No: 42<br>Milli Reasürans Pasajı<br>Şişli, İstanbul</p>
+                            <p class="mb-0"><i data-feather="clock" style="width:14px; color:#D4AF37;"></i> 10:00 - 20:00</p>
+                            <p><i data-feather="phone" style="width:14px; color:#D4AF37;"></i> +90 (212) 234 56 78</p>
+                        </div>
+                        <div class="store-services">
+                            <span class="service-badge">VIP Lounge</span>
+                            <span class="service-badge">Valet Service</span>
+                        </div>
+                        <a href="#" class="btn-gold-outline">Yol Tarifi Al</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="store-card">
+                    <div class="store-img-wrapper">
+                         <img src="assets/img/gallery/dukkan1.jpg" class="store-img" alt="İstinyePark">
+                    </div>
+                    <div class="store-body">
+                        <span class="store-district">İSTİNYE PARK</span>
+                        <h3 class="store-city">İstanbul</h3>
+                        <div class="store-info">
+                            <p>Katar Caddesi No: 11<br>Lüks Markalar Meydanı<br>Sarıyer, İstanbul</p>
+                            <p class="mb-0"><i data-feather="clock" style="width:14px; color:#D4AF37;"></i> 10:00 - 22:00</p>
+                            <p><i data-feather="phone" style="width:14px; color:#D4AF37;"></i> +90 (212) 345 67 89</p>
+                        </div>
+                        <div class="store-services">
+                            <span class="service-badge">Private Viewing</span>
+                            <span class="service-badge">Click & Collect</span>
+                        </div>
+                        <a href="#" class="btn-gold-outline">Yol Tarifi Al</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="store-card">
+                    <div class="store-img-wrapper">
+                         <img src="assets/img/gallery/dukkan3.jpg" class="store-img" alt="Panora">
+                    </div>
+                    <div class="store-body">
+                        <span class="store-district">PANORA AVM</span>
+                        <h3 class="store-city">Ankara</h3>
+                        <div class="store-info">
+                            <p>Turan Güneş Bulvarı No: 182<br>Zemin Kat, No: 12<br>Oran, Çankaya</p>
+                            <p class="mb-0"><i data-feather="clock" style="width:14px; color:#D4AF37;"></i> 10:00 - 22:00</p>
+                            <p><i data-feather="phone" style="width:14px; color:#D4AF37;"></i> +90 (312) 456 78 90</p>
+                        </div>
+                        <div class="store-services">
+                            <span class="service-badge">Service Center</span>
+                            <span class="service-badge">Appraisal</span>
+                        </div>
+                        <a href="#" class="btn-gold-outline">Yol Tarifi Al</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- FOOTER (Dinamik Yüklenecek) -->
+    <footer id="mainFooter"></footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Navbar ve Footer Scriptleri -->
+    <script src="assets/js/footer.js"></script> 
+    <script src="assets/js/navbar.js"></script>
+    <script>
+        feather.replace();
+    </script>
+</body>
+</html>

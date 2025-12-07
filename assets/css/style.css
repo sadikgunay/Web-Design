@@ -1,0 +1,188 @@
+/* SAATÜRN MASTER DESIGN SYSTEM 
+   Versiyon: 2025.1
+   Tasarımcı: Gemini & Sadık Günay
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Dancing+Script:wght@700&family=Cinzel:wght@500&display=swap');
+
+:root {
+    --gold: #D4AF37;
+    --gold-dim: #AA8C2C;
+    --gold-light: #F8F1D0;
+    --black-bg: #050505;
+    --panel-bg: #111111;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --glass: rgba(5, 5, 5, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --text-main: #e0e0e0;
+    --text-muted: #a0a0a0;
+}
+
+/* --- GENEL AYARLAR --- */
+body {
+    background-color: var(--black-bg);
+    color: var(--text-main);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 300;
+    padding-top: 80px; /* Navbar payı */
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6, .serif-font, .navbar-brand, .price-tag, .display-huge {
+    font-family: 'Playfair Display', serif;
+}
+
+a { text-decoration: none; transition: 0.3s; }
+::selection { background: var(--gold); color: #000; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #111; }
+::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+/* --- NAVBAR (GLOBAL) --- */
+.navbar {
+    background: var(--glass) !important;
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid var(--border-color);
+    padding: 15px 0;
+    transition: 0.4s;
+}
+.navbar.scrolled { padding: 10px 0; }
+.nav-link {
+    color: #ccc !important;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+    position: relative;
+}
+.nav-link::after {
+    content: ''; position: absolute; width: 0; height: 1px;
+    bottom: 0; left: 0; background: var(--gold); transition: 0.3s;
+}
+.nav-link:hover::after, .nav-link.active::after { width: 100%; }
+.nav-link:hover, .nav-link.active { color: var(--gold) !important; }
+
+.dropdown-menu {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-top: 3px solid var(--gold);
+}
+.dropdown-item { color: #ccc; padding: 10px 20px; font-size: 0.9rem; }
+.dropdown-item:hover { background: #222; color: var(--gold); }
+
+/* --- BUTONLAR --- */
+.btn-gold, .btn-luxury, .read-more-btn {
+    background: transparent;
+    color: var(--gold);
+    border: 1px solid var(--gold);
+    padding: 12px 30px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    transition: 0.4s;
+    display: inline-block;
+    cursor: pointer;
+    text-align: center;
+}
+.btn-gold:hover, .btn-luxury:hover, .read-more-btn:hover {
+    background: var(--gold);
+    color: #000;
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+    text-decoration: none;
+}
+.btn-gold-filled, .add-to-cart, .btn-gold-block {
+    background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+    color: #000;
+    border: none;
+    padding: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    width: 100%;
+    display: block;
+    text-align: center;
+    border-radius: 4px;
+    transition: 0.4s;
+}
+.btn-gold-filled:hover, .add-to-cart:hover, .btn-gold-block:hover { 
+    transform: translateY(-3px); color: #fff; box-shadow: 0 10px 20px rgba(0,0,0,0.5); 
+}
+
+/* --- KARTLAR & ÜRÜNLER --- */
+.product-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 20px;
+    transition: 0.4s;
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+}
+.product-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+.product-img-wrapper { position: relative; height: 250px; overflow: hidden; padding: 10px; }
+.product-img {
+    width: 100%; height: 100%; object-fit: contain;
+    transition: 0.5s; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));
+}
+.product-card:hover .product-img { transform: scale(1.08); }
+.price-tag { color: var(--gold); font-size: 1.3rem; margin: 10px 0; display: block; }
+
+/* --- ADMIN PANEL & FORMLAR --- */
+.sidebar { 
+    background: #000; border-right: 1px solid #222; 
+    min-height: 100vh; padding: 20px; 
+}
+.stat-card { 
+    background: var(--panel-bg); border: 1px solid #222; 
+    border-radius: 8px; padding: 20px; position: relative; overflow: hidden;
+    transition: 0.3s;
+}
+.stat-card:hover { border-color: var(--gold); }
+
+.table-dark { --bs-table-bg: var(--panel-bg); border-color: #333; }
+.table-dark th { color: var(--gold); font-weight: normal; border-bottom: 1px solid #444; font-size: 0.85rem; letter-spacing: 1px; }
+.table-dark td { border-bottom: 1px solid #333; color: #ccc; vertical-align: middle; }
+
+.form-control, .form-select, .custom-input {
+    background-color: rgba(255,255,255,0.05);
+    border: 1px solid #333;
+    color: white;
+    padding: 12px;
+}
+.form-control:focus, .custom-input:focus {
+    background-color: #000;
+    border-color: var(--gold);
+    color: white;
+    box-shadow: none;
+}
+
+/* --- HERO & SLIDERS --- */
+.hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, #050505 0%, rgba(0,0,0,0.4) 100%); }
+.bg-img-holder { width: 100%; height: 100%; background-size: cover; background-position: center; }
+
+/* --- MODALS --- */
+.modal-content { background: #151515; border: 1px solid var(--gold); color: #fff; }
+.modal-header { border-bottom: 1px solid #333; }
+.btn-close { filter: invert(1); }
+
+/* --- FOOTER --- */
+footer {
+    background: #000;
+    border-top: 1px solid var(--border-color);
+    padding: 60px 0 30px;
+    margin-top: auto;
+    text-align: center;
+}
+
+/* --- DİĞER ÖZEL SINIFLAR --- */
+.text-gold { color: var(--gold) !important; }
+.bg-black { background-color: #000 !important; }
+.letter-spacing-2 { letter-spacing: 2px; }
+.letter-spacing-4 { letter-spacing: 4px; }
