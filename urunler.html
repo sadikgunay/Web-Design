@@ -4,23 +4,19 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Koleksiyon | SAATÜRN</title>
-    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/feather-icons"></script>
     
     <style>
-        /* --- AYNI TASARIM KODLARI (DOKUNULMADI) --- */
+        /* CSS AYNI (DEĞİŞTİRİLMEDİ) */
         :root { --gold-start: #BF953F; --gold-mid: #FCF6BA; --gold-end: #B38728; --black-bg: #050505; --card-bg: rgba(255, 255, 255, 0.03); --border-color: rgba(255, 255, 255, 0.1); }
         body { background-color: var(--black-bg); color: #f0f0f0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; font-weight: 300; }
         h1, h2, h3, h4, .serif-font { font-family: 'Playfair Display', serif; }
         .text-gold-gradient { background: linear-gradient(to right, var(--gold-start), var(--gold-mid), var(--gold-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
-        
         .header-spacer { height: 120px; }
-
         .filter-btn { background: transparent; border: 1px solid var(--border-color); color: #888; padding: 10px 25px; margin: 5px; border-radius: 0; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px; transition: 0.3s; }
         .filter-btn:hover, .filter-btn.active { border-color: var(--gold-mid); color: #fff; box-shadow: 0 0 15px rgba(191, 149, 63, 0.2); background: rgba(255,255,255,0.05); }
-
         .product-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; padding: 40px 20px; position: relative; overflow: hidden; transition: 0.4s ease; height: 100%; }
         .product-card:hover { transform: translateY(-10px); background: rgba(255,255,255,0.05); border-color: var(--gold-mid); }
         .product-img { height: 250px; width: 100%; object-fit: contain; margin-bottom: 25px; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.6)); transition: 0.5s; }
@@ -28,12 +24,10 @@
         .price-tag { font-size: 1.4rem; color: #fff; opacity: 0.9; margin: 15px 0; font-weight: 400; }
         .btn-gold-outline { color: var(--gold-mid); border: 1px solid var(--gold-mid); padding: 12px 35px; letter-spacing: 2px; text-transform: uppercase; font-size: 0.8rem; transition: 0.3s; background: transparent; border-radius: 0; text-decoration: none; display: inline-block; }
         .btn-gold-outline:hover { background: var(--gold-mid); color: #000; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); }
-
         .fav-btn { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #888; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.3s; cursor: pointer; z-index: 10; }
         .fav-btn:hover { border-color: var(--gold-mid); color: var(--gold-mid); transform: scale(1.1); }
         .fav-btn.active { background: var(--gold-mid); color: #000; border-color: var(--gold-mid); box-shadow: 0 0 15px rgba(212,175,55,0.5); }
         .fav-btn.active svg { fill: black; }
-
         .product-item { display: none; }
         .show { display: block; animation: fadeIn 0.8s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -70,14 +64,21 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // --- SENKRON VERİ ANAHTARI ---
-        const DB_KEY = 'saaturn_pro_db';
-
         function initUrunler() {
-            // Veri Çekme (Artık otomatik doldurma yok, Admin'den geleni gösterir)
-            let urunler = JSON.parse(localStorage.getItem(DB_KEY)) || [];
+            // Veri Çekme (Admin'den kaydedilen veya varsayılanlar)
+            let urunler = JSON.parse(localStorage.getItem('saaturnUrunler')) || [];
+            
+            // Eğer liste boşsa otomatik varsayılanları yükle
+            if (urunler.length === 0) {
+                 const varsayilanlar = [
+                    { id: 1, ad: "Satürn ELITE", kat: "Prestige Series", fiyat: 24000, img: "assets/img/gallery/watch-gold.png", badge: "VİTRİN YILDIZI", filter: "prestige limited", desc: "Lüks ve zarafetin simgesi. Altın kaplama detaylar.", teknik: { mekanizma: "Otomatik (İsviçre)", kasa: "38mm Altın Kaplama", cam: "Safir", su: "10 ATM" } },
+                    { id: 2, ad: "Satürn OCEAN", kat: "Sport / Diver", fiyat: 12400, img: "assets/img/gallery/watch-2.png", badge: "", filter: "sport", desc: "Derinlerin hakimi dalgıç saati.", teknik: { mekanizma: "Otomatik", kasa: "44mm Titanyum", cam: "Hardlex", su: "30 ATM" } },
+                    { id: 3, ad: "Satürn TIMELESS", kat: "Classic", fiyat: 9250, img: "assets/img/gallery/watch-3.png", badge: "", filter: "classic", desc: "Klasik deri kordonlu tasarım.", teknik: { mekanizma: "Quartz", kasa: "40mm Çelik", cam: "Mineral", su: "5 ATM" } }
+                ];
+                localStorage.setItem('saaturnUrunler', JSON.stringify(varsayilanlar));
+                urunler = varsayilanlar;
+            }
 
-            // Favori Kontrolü
             const user = JSON.parse(localStorage.getItem("saaturn_user"));
             let favList = [];
             if(user) {
@@ -88,48 +89,38 @@
             const wrapper = document.getElementById('urunListesiWrapper');
             wrapper.innerHTML = "";
 
-            if (urunler.length === 0) {
-                wrapper.innerHTML = `
-                    <div class="col-12 text-center text-muted py-5">
-                        <i data-feather="box" style="width:50px; height:50px; opacity:0.5;"></i>
-                        <h4 class="fw-light mt-3">Koleksiyon şu an boş.</h4>
-                        <p class="small">Lütfen yönetici panelinden ürün girişi yapınız.</p>
-                    </div>`;
-                feather.replace();
-                return;
-            }
-
             urunler.forEach(u => {
                 let badgeHTML = u.badge ? `<span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3 rounded-0">${u.badge}</span>` : "";
                 
-                // --- AKILLI FİLTRELEME ---
-                // Eğer üründe 'filter' özelliği kayıtlıysa onu kullan, yoksa kategori adından türet
-                let filterClass = u.filter || "all";
-                if(!u.filter && u.kat) {
+                // Filtreleme sınıfı oluşturma (Admin'den gelen veriye göre)
+                let filterClass = u.filter;
+                if(!filterClass && u.kat) {
                     const k = u.kat.toLowerCase();
                     if(k.includes("prestige") || k.includes("elite")) filterClass = "prestige";
                     else if(k.includes("sport") || k.includes("diver")) filterClass = "sport";
                     else if(k.includes("classic")) filterClass = "classic";
                     else if(k.includes("limited")) filterClass = "limited";
+                    else filterClass = "all";
                 }
 
-                const isFav = favList.includes(u.id);
+                // Favori kontrolü (ID string/number uyumu için toString yapıldı)
+                const isFav = favList.includes(u.id) || favList.includes(u.id.toString());
                 const favClass = isFav ? "active" : "";
 
                 const kart = `
                 <div class="col-12 col-md-6 col-lg-4 product-item ${filterClass}">
                     <div class="product-card">
-                        <button class="fav-btn ${favClass}" onclick="toggleFav(${u.id}, this)">
+                        <button class="fav-btn ${favClass}" onclick="toggleFav('${u.id}', this)" title="Favorilere Ekle">
                             <i data-feather="heart"></i>
                         </button>
                         <div class="text-center mb-3 position-relative">
                             ${badgeHTML}
-                            <img src="${u.img}" class="product-img" alt="${u.ad}">
+                            <img src="${u.img}" class="product-img" alt="${u.ad}" onerror="this.src='https://via.placeholder.com/300x300?text=Görsel+Yok'">
                         </div>
                         <div class="text-center mt-4">
                             <h4 class="text-white serif-font h4 mb-1">${u.ad}</h4>
-                            <p class="text-secondary small text-uppercase">${u.kat}</p>
-                            <div class="price-tag serif-font">${u.fiyat.toLocaleString()} ₺</div>
+                            <p class="text-secondary small text-uppercase" style="letter-spacing: 1px;">${u.kat}</p>
+                            <div class="price-tag serif-font">${parseInt(u.fiyat).toLocaleString()} ₺</div>
                             <a href="urun-detay.html?id=${u.id}" class="btn-gold-outline mt-2 w-100 d-block">İNCELE</a>
                         </div>
                     </div>
@@ -137,9 +128,33 @@
                 wrapper.innerHTML += kart;
             });
 
-            // Filtreleri Yakala
             const urlParams = new URLSearchParams(window.location.search);
-            filterSelection(urlParams.get('cat') || 'all');
+            setTimeout(() => {
+                filterSelection(urlParams.get('cat') || 'all');
+                feather.replace();
+            }, 100);
+        }
+
+        function toggleFav(id, btnElement) {
+            const user = JSON.parse(localStorage.getItem("saaturn_user"));
+            if (!user) {
+                if(confirm("Favorilere eklemek için giriş yapmalısınız. Giriş sayfasına gitmek ister misiniz?")) {
+                    window.location.href = "login.html";
+                }
+                return;
+            }
+            const favKey = `saaturn_favs_${user.email}`;
+            let favIds = JSON.parse(localStorage.getItem(favKey)) || [];
+            const idString = id.toString();
+            
+            if (favIds.includes(idString)) {
+                favIds = favIds.filter(favId => favId !== idString);
+                btnElement.classList.remove("active");
+            } else {
+                favIds.push(idString);
+                btnElement.classList.add("active");
+            }
+            localStorage.setItem(favKey, JSON.stringify(favIds));
             feather.replace();
         }
 
@@ -155,26 +170,6 @@
                 btns[i].classList.remove("active");
                 if(btns[i].getAttribute("onclick").includes("'" + (c || 'all') + "'")) btns[i].classList.add("active");
             }
-        }
-
-        function toggleFav(id, btnElement) {
-            const user = JSON.parse(localStorage.getItem("saaturn_user"));
-            if (!user) { 
-                if(confirm("Giriş yapmalısınız.")) window.location.href="login.html"; 
-                return; 
-            }
-            const favKey = `saaturn_favs_${user.email}`;
-            let favIds = JSON.parse(localStorage.getItem(favKey)) || [];
-
-            if (favIds.includes(id)) {
-                favIds = favIds.filter(f => f !== id);
-                btnElement.classList.remove("active");
-            } else {
-                favIds.push(id);
-                btnElement.classList.add("active");
-            }
-            localStorage.setItem(favKey, JSON.stringify(favIds));
-            feather.replace();
         }
     </script>
 </body>
