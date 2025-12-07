@@ -10,7 +10,7 @@
 
     <script>
         if(localStorage.getItem("saaturn_session") !== "active") {
-            // window.location.href = "admin-login.html"; // Güvenlik
+            // window.location.href = "admin-login.html"; 
         }
     </script>
 
@@ -117,7 +117,7 @@
                             </div>
 
                             <div class="p-3 mb-3 border border-secondary rounded bg-dark">
-                                <label class="text-warning mb-2 border-bottom border-secondary pb-1 w-100">TEKNİK ÖZELLİKLER (AKILLI SEÇİM)</label>
+                                <label class="text-warning mb-2 border-bottom border-secondary pb-1 w-100">TEKNİK ÖZELLİKLER (SEÇİMLİ)</label>
                                 <div class="row g-3">
                                     
                                     <div class="col-6">
@@ -231,13 +231,16 @@
         feather.replace();
         let secilenResimBase64 = "";
 
+        // Veri Havuzu Anahtarımız
+        const STORAGE_KEY = 'saaturnUrunler';
+
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('show'); }
 
         function resimOnizle(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
-                if (file.size > 2000000) { // 2MB Limit
-                    alert("⚠️ Resim boyutu büyük. Sayfa yavaşlayabilir. (Önerilen < 2MB)");
+                if (file.size > 1500000) { 
+                    alert("⚠️ Resim boyutu büyük. Sayfa yavaşlayabilir. (Önerilen < 1.5MB)");
                 }
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -251,13 +254,14 @@
         }
 
         function urunKaydet() {
+            // Form verilerini al (Artık Select'lerden alıyoruz)
             const ad = document.getElementById('uAd').value;
             const fiyat = document.getElementById('uFiyat').value;
             const kat = document.getElementById('uKat').value;
             const badge = document.getElementById('uBadge').value;
             const desc = document.getElementById('uDesc').value || "Bu ürün için açıklama girilmemiştir.";
 
-            // Seçicilerden gelen veriler
+            // Teknik Veriler (Select'lerden gelenler)
             const teknik = {
                 mekanizma: document.getElementById('tMek').value,
                 kasa: document.getElementById('tKasa').value,
@@ -268,7 +272,7 @@
             if(!ad || !fiyat) { alert("Lütfen Ürün Adı ve Fiyat alanlarını doldurunuz."); return; }
             if(!secilenResimBase64) { alert("Lütfen bir ürün görseli yükleyiniz."); return; }
 
-            // Otomatik Filtreleme Etiketi
+            // Filtreleme için otomatik tag oluşturma
             let filterTag = "all";
             const k = kat.toLowerCase();
             if(k.includes("prestige") || k.includes("elite")) filterTag = "prestige";
@@ -289,26 +293,26 @@
             };
 
             try {
-                const urunler = JSON.parse(localStorage.getItem('saaturnUrunler')) || [];
+                const urunler = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
                 urunler.unshift(yeniUrun);
-                localStorage.setItem('saaturnUrunler', JSON.stringify(urunler));
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(urunler));
 
-                // Formu Sıfırla
+                // Formu Temizle
                 document.getElementById('urunForm').reset();
                 document.getElementById('imgPreview').style.display = 'none';
                 document.getElementById('noImgText').style.display = 'block';
                 secilenResimBase64 = "";
                 
                 urunleriListele();
-                alert("✅ Ürün başarıyla eklendi!");
+                alert("✅ Ürün ve teknik detaylar başarıyla kaydedildi!");
                 
             } catch (e) {
-                alert("❌ HATA: Tarayıcı hafızası doldu! Lütfen bazı eski ürünleri silin.");
+                alert("❌ HATA: Hafıza doldu! Lütfen bazı ürünleri silin.");
             }
         }
 
         function urunleriListele() {
-            const urunler = JSON.parse(localStorage.getItem('saaturnUrunler')) || [];
+            const urunler = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
             const tablo = document.getElementById('urunTablosu');
             tablo.innerHTML = "";
             document.getElementById('toplamUrun').innerText = urunler.length + " Adet";
@@ -334,10 +338,10 @@
         }
 
         function urunSil(index) {
-            if(confirm("Bu ürünü kalıcı olarak silmek istiyor musunuz?")) {
-                const urunler = JSON.parse(localStorage.getItem('saaturnUrunler'));
+            if(confirm("Silmek istiyor musunuz?")) {
+                const urunler = JSON.parse(localStorage.getItem(STORAGE_KEY));
                 urunler.splice(index, 1);
-                localStorage.setItem('saaturnUrunler', JSON.stringify(urunler));
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(urunler));
                 urunleriListele();
             }
         }
