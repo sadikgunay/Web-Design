@@ -294,8 +294,15 @@
             reveal(); 
         }
 
-        // --- VERİ FONKSİYONLARI ---
+        // --- VERİ FONKSİYONLARI (GÜNCELLENMİŞ) ---
         function verileriYukleVeKontrolEt() {
+            // ÖNEMLİ: Eğer veri zaten varsa HİÇBİR ŞEY YAPMA ve ÇIK.
+            // Böylece Admin panelinden eklediklerin silinmez.
+            if (localStorage.getItem('saaturnUrunler') !== null) {
+                return; 
+            }
+
+            // Sadece veri yoksa (ilk giriş) varsayılanları yükle
             const varsayilanUrunler = [
                 { id: 1, ad: "Satürn ELITE", kat: "Prestige Series", fiyat: 24000, img: "assets/img/gallery/watch-gold.png", badge: "VİTRİN YILDIZI", desc: "Lüks ve zarafetin simgesi. Altın kaplama detaylar.", teknik: { mekanizma: "Otomatik (İsviçre)", kasa: "38mm Altın Kaplama", cam: "Safir", su: "10 ATM" } },
                 { id: 2, ad: "Satürn PRESTIGE", kat: "Prestige Series", fiyat: 18500, img: "assets/img/gallery/watch-1.png", badge: "ÇOK SATAN", desc: "Profesyonellerin tercihi çelik kasa.", teknik: { mekanizma: "Otomatik (Japon)", kasa: "42mm Çelik", cam: "Safir", su: "5 ATM" } },
@@ -308,19 +315,23 @@
         }
         
         function slideriOlustur() {
-            const urunler = JSON.parse(localStorage.getItem('saaturnUrunler'));
+            const urunler = JSON.parse(localStorage.getItem('saaturnUrunler')) || []; // Hata önleyici || [] eklendi
             const container = document.getElementById('sliderIcerik');
             const indicators = document.getElementById('sliderIndicators');
             container.innerHTML = "";
             indicators.innerHTML = "";
+            
+            // Eğer ürünler silinmişse slider hatası vermesin
+            if(urunler.length < 3) return; 
+
             const sliderIds = [3, 4, 1];
-            const sliderUrunleri = sliderIds.map(id => urunler.find(u => u.id === id));
+            // ID'si eşleşen ürünleri bul (Bulamazsa undefined olur, filtrele)
+            const sliderUrunleri = sliderIds.map(id => urunler.find(u => u.id == id)).filter(u => u !== undefined);
 
             sliderUrunleri.forEach((u, index) => {
                 const activeClass = index === 0 ? "active" : "";
                 indicators.innerHTML += `<button type="button" data-bs-target="#anaSlider" data-bs-slide-to="${index}" class="${activeClass}"></button>`;
                 
-                // Teknik özellikleri listelemek için HTML oluşturuldu
                 let ozellikHTML = '';
                 if(u.teknik) {
                     const ozellikler = [
@@ -355,7 +366,7 @@
                                 </div>
                                 <div class="text-mask-container hero-txt-3">
                                     <p class="hero-txt-slide lead text-light mb-4 opacity-75 fw-light fs-6" style="max-width:550px; margin: 0 auto 0 0;">
-                                        ${u.desc}
+                                        ${u.desc || ''}
                                     </p>
                                 </div>
                                 
@@ -363,13 +374,13 @@
                                     ${ozellikHTML}
                                 </div>
                                 <div class="hero-btn mt-4 text-center text-lg-start">
-                                    <h3 class="text-white serif-font mb-4">${u.fiyat.toLocaleString()} ₺</h3>
+                                    <h3 class="text-white serif-font mb-4">${parseInt(u.fiyat).toLocaleString()} ₺</h3>
                                     <span class="btn-gold-outline">İNCELE & SATIN AL</span>
                                 </div>
                             </div>
 
                             <div class="col-lg-6 text-center z-2 order-1 order-lg-2">
-                                <img src="${u.img}" class="hero-product-img" alt="${u.ad}">
+                                <img src="${u.img}" class="hero-product-img" alt="${u.ad}" onerror="this.style.display='none'">
                             </div>
 
                         </div>
@@ -380,22 +391,26 @@
         }
 
         function vitriniGuncelle() {
-            const urunler = JSON.parse(localStorage.getItem('saaturnUrunler'));
+            const urunler = JSON.parse(localStorage.getItem('saaturnUrunler')) || [];
             const wrapper = document.getElementById('vitrinListesi');
             wrapper.innerHTML = "";
 
-            urunler.filter(u => [2, 5, 6].includes(u.id)).forEach(u => {
+            // Vitrinde gösterilecek 3 ürün (ID'si 2, 5, 6 olanlar varsa, yoksa ilk 3)
+            let vitrinUrunleri = urunler.filter(u => [2, 5, 6].includes(Number(u.id)));
+            if(vitrinUrunleri.length === 0 && urunler.length > 0) vitrinUrunleri = urunler.slice(0, 3);
+
+            vitrinUrunleri.forEach(u => {
                 const kart = `
                 <div class="col-12 col-md-6 col-lg-4 reveal">
                     <div class="product-card">
                         <div class="text-center mb-3 position-relative">
                             <span class="badge bg-warning text-dark position-absolute top-0 end-0 mt-2 me-2 rounded-0">${u.badge || ''}</span>
-                            <img src="${u.img}" class="product-img" alt="${u.ad}">
+                            <img src="${u.img}" class="product-img" alt="${u.ad}" onerror="this.src='https://via.placeholder.com/300x300?text=Görsel+Yok'">
                         </div>
                         <div class="text-center mt-3">
                             <h4 class="text-white serif-font h4 mb-1">${u.ad}</h4>
                             <p class="text-secondary small text-uppercase" style="letter-spacing: 1px;">${u.kat}</p>
-                            <div class="price-tag serif-font">${u.fiyat.toLocaleString()} ₺</div>
+                            <div class="price-tag serif-font">${parseInt(u.fiyat).toLocaleString()} ₺</div>
                             <a href="urun-detay.html?id=${u.id}" class="btn-gold-outline mt-2 w-100 d-block" style="padding: 10px; font-size: 0.8rem;">İNCELE</a>
                         </div>
                     </div>
