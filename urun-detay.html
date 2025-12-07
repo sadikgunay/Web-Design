@@ -10,39 +10,23 @@
     <script src="https://unpkg.com/feather-icons"></script>
     
     <style>
-        /* --- TASARIM AYARLARI --- */
+        /* TASARIM AYARLARI (DEĞİŞTİRİLMEDİ) */
         :root { --gold-start: #BF953F; --gold-mid: #FCF6BA; --gold-end: #B38728; --black-bg: #050505; --card-bg: rgba(255, 255, 255, 0.03); --border-color: rgba(255, 255, 255, 0.1); }
         body { background-color: var(--black-bg); color: #f0f0f0; font-family: 'Montserrat', sans-serif; font-weight: 300; }
         h1, h2, h3, h4, .serif-font { font-family: 'Playfair Display', serif; }
         .text-gold-gradient { background: linear-gradient(to right, var(--gold-start), var(--gold-mid), var(--gold-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
-        
         .page-header-spacer { height: 120px; }
-
-        /* Ürün Vitrini */
-        .product-stage { 
-            background: radial-gradient(circle at center, #222 0%, #050505 70%); 
-            border: 1px solid var(--border-color); border-radius: 4px; padding: 60px; 
-            text-align: center; min-height: 500px; display: flex; align-items: center; justify-content: center;
-        }
+        .product-stage { background: radial-gradient(circle at center, #222 0%, #050505 70%); border: 1px solid var(--border-color); border-radius: 4px; padding: 60px; text-align: center; min-height: 500px; display: flex; align-items: center; justify-content: center; }
         .main-img { max-height: 400px; width: auto; max-width: 100%; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5)); animation: float 6s ease-in-out infinite; }
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
-
-        /* Form Elemanları */
         .form-control, .form-select { background: #050505; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 0; }
         .form-control:focus, .form-select:focus { background: #050505; color: #fff; border-color: var(--gold-mid); box-shadow: none; }
-        
-        /* Renk Seçimi */
         .color-opt { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #333; display: inline-block; margin-right: 15px; cursor: pointer; transition: 0.3s; }
         .color-opt.selected { border-color: var(--gold-mid); transform: scale(1.2); box-shadow: 0 0 15px rgba(255,255,255,0.2); }
-
-        /* Butonlar */
         .btn-gold-solid { background: linear-gradient(135deg, var(--gold-start), var(--gold-end)); color: #000; border: none; padding: 15px 40px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; width: 100%; transition: 0.3s; border-radius: 0; }
         .btn-gold-solid:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(191, 149, 63, 0.3); color: #000; }
-        
-        /* AUTOFILL BUTONU */
         .btn-autofill { background: rgba(191, 149, 63, 0.15); border: 1px dashed var(--gold-mid); color: var(--gold-mid); font-size: 0.9rem; width: 100%; padding: 15px; margin-bottom: 20px; display: none; cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; }
         .btn-autofill:hover { background: var(--gold-mid); color: #000; font-weight: bold; }
-        
         .modal-content { background: #1a1a1a; border: 1px solid #333; border-radius: 0; }
         .modal-header { border-bottom: 1px solid #333; }
         .accordion-item { background: transparent; border: 1px solid var(--border-color); border-radius: 0; margin-bottom: 10px; }
@@ -82,22 +66,14 @@
                 </div>
 
                 <div class="display-6 serif-font mb-4" id="pPrice">...</div>
-                <p class="text-secondary fw-light mb-4" id="pDesc">Bu model, markamızın ustalık eseridir. Özel yapım mekanizması ve kusursuz işçiliği ile zamanı sanatla buluşturur.</p>
+                <p class="text-secondary fw-light mb-4" id="pDesc">Açıklama yükleniyor...</p>
 
                 <div class="mb-5" id="colorSelectionArea" style="display:none;">
                     <p class="small text-white fw-bold mb-3">RENK SEÇİNİZ</p>
                     <div class="d-flex align-items-center">
-                        <div class="color-opt selected" 
-                             style="background:linear-gradient(135deg, #FFD700, #DAA520)" 
-                             onclick="selectColor(this, 'Altın', 'assets/img/gallery/watch-gold.png')"></div>
-                        
-                        <div class="color-opt" 
-                             style="background:linear-gradient(135deg, #E0E0E0, #A0A0A0)" 
-                             onclick="selectColor(this, 'Gümüş', 'assets/img/gallery/watch-silver.png')"></div>
-                        
-                        <div class="color-opt" 
-                             style="background:linear-gradient(135deg, #222, #000)" 
-                             onclick="selectColor(this, 'Siyah', 'assets/img/gallery/watch-black.png')"></div>
+                        <div class="color-opt selected" style="background:linear-gradient(135deg, #FFD700, #DAA520)" onclick="selectColor(this, 'Altın')"></div>
+                        <div class="color-opt" style="background:linear-gradient(135deg, #E0E0E0, #A0A0A0)" onclick="selectColor(this, 'Gümüş')"></div>
+                        <div class="color-opt" style="background:linear-gradient(135deg, #222, #000)" onclick="selectColor(this, 'Siyah')"></div>
                     </div>
                     <p class="text-secondary small mt-2">Seçilen Renk: <span id="selectedColorText" class="text-white">Altın</span></p>
                 </div>
@@ -109,7 +85,7 @@
                 <div class="accordion mt-5" id="acc">
                     <div class="accordion-item">
                         <h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#c1">Teknik Özellikler</button></h2>
-                        <div id="c1" class="accordion-collapse collapse show"><div class="accordion-body">Mekanizma: Otomatik Kalibre (İsviçre)<br>Kasa: 42mm Paslanmaz Çelik/Titanyum<br>Cam: Safir Kristal<br>Su Geçirmezlik: 10 ATM</div></div>
+                        <div id="c1" class="accordion-collapse collapse show"><div class="accordion-body" id="teknikBody">...</div></div>
                     </div>
                     <div class="accordion-item">
                         <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c2">Teslimat & İade</button></h2>
@@ -152,7 +128,7 @@
                             <select id="cPayment" class="form-select">
                                 <option value="Kredi Kartı">Kredi Kartı (Online)</option>
                                 <option value="Havale">Havale / EFT</option>
-                                <option value="Kapıda Ödeme">Kapıda Ödeme </option>
+                                <option value="Kapıda Ödeme">Kapıda Ödeme</option>
                             </select>
                         </div>
                         <button type="submit" id="btnSubmit" class="btn btn-gold-solid py-3">SİPARİŞİ ONAYLA</button>
@@ -178,46 +154,53 @@
             
             // Veri Çekme
             let urunler = JSON.parse(localStorage.getItem('saaturnUrunler')) || [];
+            
+            // Eğer ürün yoksa demo göster (Error handling)
             if(urunler.length === 0) urunler = [{id:1, ad:"Satürn ELITE", kat:"Elite Series", fiyat:24000, img:"assets/img/gallery/watch-gold.png"}];
             
-            urunVerisi = urunler.find(u => u.id == id);
+            // ID eşleşmesi (Hem sayı hem string olarak dene)
+            urunVerisi = urunler.find(u => u.id == id || u.id.toString() === id.toString());
 
             if(urunVerisi) {
+                // Temel Bilgiler
                 document.getElementById('pName').innerText = urunVerisi.ad;
                 document.getElementById('pCat').innerText = urunVerisi.kat;
-                document.getElementById('pPrice').innerText = urunVerisi.fiyat.toLocaleString() + ' ₺';
-                
-                if(urunVerisi.aciklama) document.getElementById('pDesc').innerText = urunVerisi.aciklama;
+                document.getElementById('pPrice').innerText = parseInt(urunVerisi.fiyat).toLocaleString() + ' ₺';
                 document.getElementById('mainImage').src = urunVerisi.img; 
                 document.getElementById('pId').innerText = "#" + urunVerisi.id;
                 document.getElementById('bcName').innerText = urunVerisi.ad.toUpperCase();
-                // --- TEKNİK ÖZELLİKLERİ YÜKLE ---
-if(urunVerisi.teknik) {
-    const teknikHTML = `
-        Mekanizma: ${urunVerisi.teknik.mekanizma}<br>
-        Kasa: ${urunVerisi.teknik.kasa}<br>
-        Cam: ${urunVerisi.teknik.cam}<br>
-        Su Geçirmezlik: ${urunVerisi.teknik.su}
-    `;
-    // Accordion içindeki Teknik Özellikler kısmını (id="c1") bulup değiştiriyoruz
-    document.querySelector('#c1 .accordion-body').innerHTML = teknikHTML;
-} else {
-    // Eğer eski bir ürünse ve teknik verisi yoksa varsayılan yazsın
-    document.querySelector('#c1 .accordion-body').innerHTML = "Bu ürün için teknik detay girilmemiştir.";
-}
+                
+                // Açıklama (Admin'den girilen)
+                document.getElementById('pDesc').innerText = urunVerisi.desc || "Bu ürün için henüz detaylı bir açıklama girilmemiştir.";
 
-                // --- ÖZEL RENK KONTROLÜ ---
-                // Sadece isminde "ELITE" geçen ürünlerde renk seçeneğini göster
+                // Teknik Özellikler (Admin'den girilen)
+                let teknikHTML = "Bilgi Yok";
+                if(urunVerisi.teknik) {
+                    teknikHTML = `
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><strong class="text-white">Mekanizma:</strong> ${urunVerisi.teknik.mekanizma}</li>
+                            <li class="mb-2"><strong class="text-white">Kasa Materyali:</strong> ${urunVerisi.teknik.kasa}</li>
+                            <li class="mb-2"><strong class="text-white">Cam Tipi:</strong> ${urunVerisi.teknik.cam}</li>
+                            <li><strong class="text-white">Su Geçirmezlik:</strong> ${urunVerisi.teknik.su}</li>
+                        </ul>
+                    `;
+                }
+                document.getElementById('teknikBody').innerHTML = teknikHTML;
+
+                // Renk Seçimi Kontrolü
                 if(urunVerisi.ad.toUpperCase().includes("ELITE")) {
                     document.getElementById('colorSelectionArea').style.display = "block";
-                    document.getElementById('selectedColor').value = "Altın"; // Varsayılan
+                    document.getElementById('selectedColor').value = "Altın";
                 } else {
                     document.getElementById('colorSelectionArea').style.display = "none";
-                    document.getElementById('selectedColor').value = "Standart"; // Renksizler için
+                    document.getElementById('selectedColor').value = "Standart";
                 }
+            } else {
+                alert("Ürün bulunamadı veya silinmiş.");
+                window.location.href = "urunler.html";
             }
 
-            // GİRİŞ KONTROLÜ
+            // Üye Girişi Kontrolü (Form Doldurma İçin)
             const userData = localStorage.getItem('saaturn_user');
             if(userData) {
                 aktifUye = JSON.parse(userData);
@@ -226,27 +209,19 @@ if(urunVerisi.teknik) {
             }
         };
 
-        // --- GELİŞMİŞ RENK SEÇİMİ (Resmi de değiştirir) ---
-        function selectColor(el, colorName, newImgSrc) {
-            // 1. Görsel Seçimi
+        function selectColor(el, colorName) {
             document.querySelectorAll('.color-opt').forEach(opt => opt.classList.remove('selected'));
             el.classList.add('selected');
-            
-            // 2. Değerleri Güncelle
             document.getElementById('selectedColor').value = colorName;
             document.getElementById('selectedColorText').innerText = colorName;
-            
-            // 3. Ana Resmi Değiştir
-            document.getElementById('mainImage').src = newImgSrc;
         }
 
         function siparisFormunuAc() {
             if(!urunVerisi) return;
             document.getElementById('mName').innerText = urunVerisi.ad;
             document.getElementById('mPrice').innerText = document.getElementById('pPrice').innerText;
-            document.getElementById('mImg').src = document.getElementById('mainImage').src; // Güncel resmi al
+            document.getElementById('mImg').src = document.getElementById('mainImage').src; 
             
-            // Renk bilgisini modalda göster (Sadece standart değilse)
             const renk = document.getElementById('selectedColor').value;
             if(renk !== "Standart") {
                 document.getElementById('mColor').innerText = "(" + renk + ")";
@@ -275,7 +250,7 @@ if(urunVerisi.teknik) {
             btn.innerText = "İŞLENİYOR...";
             setTimeout(() => {
                 const isim = document.getElementById('cName').value;
-                let adminFiyat = urunVerisi.fiyat.toLocaleString() + " ₺";
+                let adminFiyat = parseInt(urunVerisi.fiyat).toLocaleString() + " ₺";
 
                 const siparis = {
                     id: Math.floor(Math.random() * 90000) + 10000,
