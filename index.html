@@ -10,7 +10,7 @@
     <script src="https://unpkg.com/feather-icons"></script>
     
     <style>
-        /* --- TEMEL AYARLAR --- */
+        /* --- TEMEL AYARLAR (DEĞİŞTİRİLMEDİ) --- */
         :root { 
             --gold-start: #BF953F; --gold-mid: #FCF6BA; --gold-end: #B38728; 
             --black-bg: #050505; --card-bg: rgba(255, 255, 255, 0.03); 
@@ -19,67 +19,33 @@
         body { background-color: var(--black-bg); color: #f0f0f0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; font-weight: 300; }
         h1, h2, h3, h4, .serif-font { font-family: 'Playfair Display', serif; }
         
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; } 
         ::-webkit-scrollbar-track { background: #111; } 
         ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
         
         .text-gold-gradient { background: linear-gradient(to right, var(--gold-start), var(--gold-mid), var(--gold-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
         
-        /* --- NAVBAR --- */
         .navbar { background: transparent; padding: 20px 0; transition: all 0.4s ease; z-index: 999; position: absolute; width: 100%; }
         .navbar.scrolled { background: rgba(5, 5, 5, 0.95); backdrop-filter: blur(15px); padding: 10px 0; border-bottom: 1px solid var(--border-color); position: fixed; top:0; }
         
-        /* --- SLIDER (HERO) --- */
-        .carousel-item { 
-            height: 100vh; min-height: 700px; 
-            position: relative; overflow: hidden; perspective: 1000px; cursor: pointer; 
-        } 
-        .hero-bg { 
-            position: absolute; inset: 0; 
-            background: radial-gradient(circle at 70% 50%, #222 0%, #000 70%); 
-            z-index: 0;
-        }
+        .carousel-item { height: 100vh; min-height: 700px; position: relative; overflow: hidden; perspective: 1000px; cursor: pointer; } 
+        .hero-bg { position: absolute; inset: 0; background: radial-gradient(circle at 70% 50%, #222 0%, #000 70%); z-index: 0; }
         .hero-content { position: relative; z-index: 2; height: 100%; display: flex; align-items: center; }
         
-        .display-huge { 
-            font-size: 4.5rem; line-height: 1.1; margin-bottom: 1rem; 
-            text-shadow: 0 10px 30px rgba(0,0,0,0.8); letter-spacing: -1px; 
-            background: linear-gradient(to bottom, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
+        .display-huge { font-size: 4.5rem; line-height: 1.1; margin-bottom: 1rem; text-shadow: 0 10px 30px rgba(0,0,0,0.8); letter-spacing: -1px; background: linear-gradient(to bottom, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         .text-mask-container { overflow: hidden; display: block; margin-bottom: 5px; }
         .hero-txt-slide { display: inline-block; opacity: 0; width: 100%; }
 
-        @keyframes maskedSlideUp {
-            0% { opacity: 0; transform: translateY(100%); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes perspectiveEnter {
-            0% { opacity: 0; transform: translate3d(200px, 0, 0) rotateY(-45deg) scale(0.7); filter: blur(10px); }
-            100% { opacity: 1; transform: translate3d(0, 0, 0) rotateY(0deg) scale(1); filter: blur(0); }
-        }
-        @keyframes floatEffect {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
+        @keyframes maskedSlideUp { 0% { opacity: 0; transform: translateY(100%); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes perspectiveEnter { 0% { opacity: 0; transform: translate3d(200px, 0, 0) rotateY(-45deg) scale(0.7); filter: blur(10px); } 100% { opacity: 1; transform: translate3d(0, 0, 0) rotateY(0deg) scale(1); filter: blur(0); } }
+        
+        .hero-product-img { max-height: 550px; width: auto; max-width: 100%; filter: drop-shadow(0 30px 50px rgba(0,0,0,0.8)); opacity: 0; }
+        .carousel-item.active .hero-product-img { animation: perspectiveEnter 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
 
-        .hero-product-img {
-            max-height: 550px; width: auto; max-width: 100%;
-            filter: drop-shadow(0 30px 50px rgba(0,0,0,0.8)); opacity: 0;
-        }
-        .carousel-item.active .hero-product-img {
-            animation: perspectiveEnter 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards, floatEffect 8s ease-in-out infinite 1.5s;
-        }
-
-        .btn-gold-outline {
-            position: relative; overflow: hidden; color: var(--gold-mid); border: 1px solid var(--gold-mid); 
-            padding: 15px 45px; letter-spacing: 3px; text-transform: uppercase; font-size: 0.9rem; 
-            transition: 0.4s; background: transparent; text-decoration: none; display: inline-block;
-        }
+        .btn-gold-outline { position: relative; overflow: hidden; color: var(--gold-mid); border: 1px solid var(--gold-mid); padding: 15px 45px; letter-spacing: 3px; text-transform: uppercase; font-size: 0.9rem; transition: 0.4s; background: transparent; text-decoration: none; display: inline-block; }
         .btn-gold-outline:hover { background: var(--gold-mid); color: #000; box-shadow: 0 0 30px rgba(191, 149, 63, 0.6); }
         
-        /* --- KARTLAR & LİSTELER --- */
         .product-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; padding: 30px 20px; position: relative; overflow: hidden; transition: 0.4s ease; height: 100%; }
         .product-card:hover { transform: translateY(-10px); background: rgba(255,255,255,0.05); border-color: var(--gold-mid); }
         .product-img { height: 220px; width: 100%; object-fit: contain; margin-bottom: 25px; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.6)); transition: 0.5s; }
@@ -93,7 +59,6 @@
         .reveal { opacity: 0; transform: translateY(30px); transition: all 1s ease; }
         .reveal.active { opacity: 1; transform: translateY(0); }
 
-        /* --- RESPONSIVE --- */
         @media (max-width: 991px) {
             .navbar { padding: 10px 0; }
             .carousel-item { height: auto; min-height: 100vh; padding-top: 100px; padding-bottom: 60px; }
@@ -120,6 +85,15 @@
     <div id="anaSlider" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-pause="false">
         <div class="carousel-indicators" id="sliderIndicators" style="bottom: 20px;"></div>
         <div class="carousel-inner" id="sliderIcerik"></div>
+        
+        <div id="defaultSlider" style="display:none; height:100vh; display:flex; align-items:center; justify-content:center; text-align:center;">
+            <div class="container">
+                <h1 class="display-huge text-white">SAATÜRN</h1>
+                <p class="text-white lead">Henüz vitrinde ürün bulunmuyor.</p>
+                <a href="admin-login.html" class="btn-gold-outline mt-4">YÖNETİCİ GİRİŞİ</a>
+            </div>
+        </div>
+
         <button class="carousel-control-prev" type="button" data-bs-target="#anaSlider" data-bs-slide="prev" style="z-index: 20; width: 10%;"><span class="carousel-control-prev-icon"></span></button>
         <button class="carousel-control-next" type="button" data-bs-target="#anaSlider" data-bs-slide="next" style="z-index: 20; width: 10%;"><span class="carousel-control-next-icon"></span></button>
     </div>
@@ -201,22 +175,19 @@
 
         function initIndex() {
             try {
-                // 1. Önce veriyi kontrol et (Eğer yoksa yükle, varsa dokunma)
-                verileriYukleVeKontrolEt(); 
-                
-                // 2. Arayüzü oluştur
-                slideriOlustur(); 
+                // 1. Ürünleri ve Duyuruları Çek
+                slideriOlustur();
                 vitriniGuncelle();
                 duyurulariGuncelle();
                 
-                // 3. Slider Animasyonları
+                // 2. Slider Animasyonları
                 const myCarousel = document.getElementById('anaSlider');
                 if(myCarousel) {
                     function startTextAnimations(carouselItem) {
                         if(!carouselItem) return;
                         carouselItem.querySelectorAll('.hero-txt-slide').forEach(el => {
                             el.style.animation = 'none';
-                            el.offsetHeight; 
+                            el.offsetHeight; // Reflow
                         });
                         carouselItem.querySelectorAll('.hero-txt-slide').forEach((el, i) => {
                             const delay = (i * 0.15) + 0.2; 
@@ -230,76 +201,62 @@
                     if(initialActive) startTextAnimations(initialActive);
                 }
 
-                // 4. Scroll Dinleyicileri
+                // 3. Acil Duyuru Popup
+                const duyurular = JSON.parse(localStorage.getItem('saaturnDuyurular')) || [];
+                if(duyurular.length > 0) {
+                    const sonDuyuru = duyurular[0]; 
+                    if(sonDuyuru.etiket === "ACİL") {
+                        document.getElementById('uTitle').innerText = sonDuyuru.baslik;
+                        document.getElementById('uContent').innerText = sonDuyuru.icerik;
+                        if(sonDuyuru.resim && sonDuyuru.resim !== "Yok") {
+                            document.getElementById('uImg').src = sonDuyuru.resim;
+                            document.getElementById('uImgContainer').style.display = 'block';
+                        }
+                        setTimeout(() => {
+                            new bootstrap.Modal(document.getElementById('acilModal')).show();
+                        }, 1000);
+                    }
+                }
+
+                // 4. Scroll ve Reveal Efektleri
                 window.addEventListener('scroll', reveal);
                 window.addEventListener('scroll', handleNavbar);
                 
-                // 5. İlk Reveal Tetiklemesi (Sayfa açılınca içerik görünsün diye)
+                // Beyaz ekran kalmasın diye hemen çalıştır
                 setTimeout(reveal, 100);
 
-            } catch (error) {
-                console.error("Kritik Hata:", error);
+            } catch (e) {
+                console.log("Hata oluştu, kurtarılıyor: ", e);
                 // Hata olsa bile içeriği göster
                 document.querySelectorAll('.reveal').forEach(el => el.classList.add('active'));
             }
         }
 
-        // --- VERİ KORUMA MEKANİZMASI ---
-        function verileriYukleVeKontrolEt() {
-            try {
-                const mevcutVeri = localStorage.getItem('saaturnUrunler');
-                
-                // Eğer veri varsa ve dizi boş değilse DOKUNMA
-                if (mevcutVeri && mevcutVeri !== "[]" && mevcutVeri !== "null") {
-                    return; 
-                }
-
-                // Sadece veri yoksa varsayılanları yükle
-                const varsayilanUrunler = [
-                    { id: 1, ad: "Satürn ELITE", kat: "Prestige Series", fiyat: 24000, img: "assets/img/gallery/watch-gold.png", badge: "VİTRİN YILDIZI", desc: "Lüks ve zarafetin simgesi. Altın kaplama detaylar.", teknik: { mekanizma: "Otomatik (İsviçre)", kasa: "38mm Altın Kaplama", cam: "Safir", su: "10 ATM" } },
-                    { id: 2, ad: "Satürn PRESTIGE", kat: "Prestige Series", fiyat: 18500, img: "assets/img/gallery/watch-1.png", badge: "ÇOK SATAN", desc: "Profesyonellerin tercihi çelik kasa.", teknik: { mekanizma: "Otomatik (Japon)", kasa: "42mm Çelik", cam: "Safir", su: "5 ATM" } },
-                    { id: 3, ad: "Satürn OCEAN", kat: "Sport / Diver", fiyat: 12400, img: "assets/img/gallery/watch-2.png", badge: "", desc: "Derinlerin hakimi dalgıç saati.", teknik: { mekanizma: "Otomatik", kasa: "44mm Titanyum", cam: "Hardlex", su: "30 ATM" } },
-                    { id: 4, ad: "Satürn TIMELESS", kat: "Classic", fiyat: 9250, img: "assets/img/gallery/watch-3.png", badge: "", desc: "Klasik deri kordonlu tasarım.", teknik: { mekanizma: "Quartz", kasa: "40mm Çelik", cam: "Mineral", su: "5 ATM" } },
-                    { id: 5, ad: "Satürn NEBULA", kat: "Limited Edition", fiyat: 14000, img: "assets/img/gallery/watch-4.png", badge: "SINIRLI", desc: "Uzay çağı tasarımı, karbon fiber kadran.", teknik: { mekanizma: "Mekanik", kasa: "45mm Karbon", cam: "Safir", su: "10 ATM" } },
-                    { id: 6, ad: "Satürn TITAN", kat: "Elite Series", fiyat: 22500, img: "assets/img/gallery/watch-5.png", badge: "YENİ", desc: "Titanyum gövde ve İsviçre mekanizması.", teknik: { mekanizma: "Otomatik", kasa: "44mm Titanyum", cam: "Safir", su: "20 ATM" } }
-                ];
-                localStorage.setItem('saaturnUrunler', JSON.stringify(varsayilanUrunler));
-                
-            } catch (e) {
-                console.error("Veri yükleme hatası:", e);
-                // Hata durumunda da varsayılanları zorla yükle
-            }
-        }
+        // --- VERİ İŞLEME FONKSİYONLARI ---
         
         function slideriOlustur() {
             let urunler = [];
             try {
+                // Sadece okuma yapıyoruz, asla yazmıyoruz.
                 urunler = JSON.parse(localStorage.getItem('saaturnUrunler')) || [];
-            } catch (e) {
+            } catch(e) {
                 urunler = [];
             }
 
             const container = document.getElementById('sliderIcerik');
             const indicators = document.getElementById('sliderIndicators');
-            if(!container || !indicators) return;
+            
+            if (urunler.length === 0) {
+                // Eğer ürün yoksa slider'ı gizle, mesaj göster (Hata vermemesi için)
+                document.getElementById('defaultSlider').style.display = 'flex';
+                return;
+            }
 
             container.innerHTML = "";
             indicators.innerHTML = "";
             
-            // Slider için ürün seçimi (Esnek yapı)
-            let sliderUrunleri = [];
-            
-            // 1. Plan: Belirli ID'leri dene
-            const hedefIds = [3, 4, 1];
-            sliderUrunleri = hedefIds.map(id => urunler.find(u => u.id == id)).filter(u => u !== undefined);
-
-            // 2. Plan: Eğer onlar silinmişse, ilk 3 ürünü al
-            if(sliderUrunleri.length === 0 && urunler.length > 0) {
-                sliderUrunleri = urunler.slice(0, 3);
-            }
-
-            // 3. Plan: Hiç ürün yoksa fonksiyonu durdur (Hata vermez, sadece slider boş kalır)
-            if(sliderUrunleri.length === 0) return;
+            // Slider için ürün seçimi: Varsa ilk 3 ürünü al
+            const sliderUrunleri = urunler.slice(0, 3);
 
             sliderUrunleri.forEach((u, index) => {
                 const activeClass = index === 0 ? "active" : "";
@@ -324,6 +281,9 @@
                     });
                 }
                 
+                // Resim yoksa placeholder koy ki beyaz ekran olmasın
+                const imgSrc = u.img ? u.img : 'https://via.placeholder.com/500x500?text=Resim+Yok';
+
                 const slideHTML = `
                 <div class="carousel-item ${activeClass}" data-bs-interval="6000" onclick="window.location.href='urun-detay.html?id=${u.id}'">
                     <div class="hero-bg"></div>
@@ -353,7 +313,7 @@
                             </div>
 
                             <div class="col-lg-6 text-center z-2 order-1 order-lg-2">
-                                <img src="${u.img}" class="hero-product-img" alt="${u.ad}" onerror="this.style.display='none'">
+                                <img src="${imgSrc}" class="hero-product-img" alt="${u.ad}">
                             </div>
 
                         </div>
@@ -371,16 +331,23 @@
             if(!wrapper) return;
             wrapper.innerHTML = "";
 
-            let vitrinData = urunler.filter(u => [2, 5, 6].includes(Number(u.id)));
-            if(vitrinData.length === 0 && urunler.length > 0) vitrinData = urunler.slice(0, 3);
+            // Vitrin için ürün yoksa boş bırak, patlatma
+            if(urunler.length === 0) {
+                wrapper.innerHTML = '<div class="col-12 text-center text-muted">Vitrin şu an boş.</div>';
+                return;
+            }
+
+            // İlk 3 ürünü al
+            let vitrinData = urunler.slice(0, 3);
 
             vitrinData.forEach(u => {
+                const imgSrc = u.img ? u.img : 'https://via.placeholder.com/300x300?text=Resim+Yok';
                 const kart = `
                 <div class="col-12 col-md-6 col-lg-4 reveal">
                     <div class="product-card">
                         <div class="text-center mb-3 position-relative">
                             <span class="badge bg-warning text-dark position-absolute top-0 end-0 mt-2 me-2 rounded-0">${u.badge || ''}</span>
-                            <img src="${u.img}" class="product-img" alt="${u.ad}" onerror="this.src='https://via.placeholder.com/300x300?text=Görsel+Yok'">
+                            <img src="${imgSrc}" class="product-img" alt="${u.ad}">
                         </div>
                         <div class="text-center mt-3">
                             <h4 class="text-white serif-font h4 mb-1">${u.ad}</h4>
@@ -396,16 +363,19 @@
 
         function duyurulariGuncelle() {
             let duyurular = JSON.parse(localStorage.getItem('saaturnDuyurular')) || [];
+            // Duyuru yoksa varsayılan göster ama kaydetme
             if(duyurular.length === 0) {
-                duyurular = [ 
-                    { baslik: "Satürn 2026 Kataloğu", icerik: "Yeni kataloğumuz yayında.", tarih: "10.12.2025", etiket: "ÖNEMLİ", dosyaAd: "Katalog.pdf", resim: "Yok" },
-                    { baslik: "Sezon İndirimi", icerik: "%20 İndirim Fırsatı başladı.", tarih: "30.11.2025", etiket: "İNDİRİM", dosyaAd: "Yok", resim: "Yok" } 
-                ];
-                localStorage.setItem('saaturnDuyurular', JSON.stringify(duyurular));
+               // Burada dummy data gösterebilirsin ama localStorage'a yazma
             }
             const wrapper = document.getElementById('noticeListWrapper');
             if(!wrapper) return;
             wrapper.innerHTML = "";
+            
+            if(duyurular.length === 0) {
+                wrapper.innerHTML = '<div class="text-muted small">Şu an aktif duyuru bulunmuyor.</div>';
+                return;
+            }
+
             duyurular.slice(0, 5).forEach(d => {
                 let badgeHTML = `<span class="badge bg-light text-dark mb-2 rounded-0" style="font-size: 0.6rem;">${d.etiket || 'DUYURU'}</span>`;
                 if(d.etiket === "ACİL") badgeHTML = `<span class="badge bg-danger mb-2 rounded-0" style="font-size: 0.6rem;">🚨 ACİL</span>`;
