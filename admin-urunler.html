@@ -10,7 +10,7 @@
 
     <script>
         if(localStorage.getItem("saaturn_session") !== "active") {
-            // window.location.href = "admin-login.html"; // Güvenlik için açabilirsin
+            // window.location.href = "admin-login.html"; // Güvenlik
         }
     </script>
 
@@ -28,6 +28,7 @@
 
         .card-custom { background: var(--panel); border: 1px solid #222; border-radius: 12px; height: 100%; margin-bottom: 20px; }
         .card-header-custom { background: transparent; border-bottom: 1px solid #333; padding: 20px; }
+        
         label { color: var(--gold) !important; font-size: 0.7rem; letter-spacing: 1px; font-weight: 700; margin-bottom: 8px; display: block; text-transform: uppercase; }
         .form-control, .form-select { background-color: #000 !important; border: 1px solid #333; color: #fff !important; padding: 12px; border-radius: 6px; }
         .form-control:focus, .form-select:focus { border-color: var(--gold); box-shadow: 0 0 10px rgba(212, 175, 55, 0.1); }
@@ -66,7 +67,7 @@
             <a href="istatistik.html" class="nav-link"><span data-feather="pie-chart"></span> İstatistikler</a>
             
             <div class="mt-5 border-top border-secondary pt-3">
-                <a href="urunler.html" class="nav-link"><span data-feather="external-link"></span> Siteye Git</a>
+                <a href="urunler.html" target="_blank" class="nav-link"><span data-feather="external-link"></span> Siteye Git</a>
                 <a href="#" onclick="cikisYap()" class="nav-link text-danger"><span data-feather="log-out"></span> Çıkış Yap</a>
             </div>
         </div>
@@ -78,10 +79,7 @@
                 <h6 class="text-secondary mb-1" style="color:#aaa !important;">ENVANTER</h6>
                 <h3 class="fw-bold m-0 text-white">Ürün Kataloğu</h3>
             </div>
-            <button class="btn btn-outline-warning btn-sm" onclick="varsayilanlariYukle()">
-                <span data-feather="rotate-ccw" style="width:14px;"></span> Varsayılanları Yükle (Reset)
-            </button>
-        </div>
+            </div>
 
         <div class="row g-4">
             <div class="col-lg-5">
@@ -115,30 +113,72 @@
 
                             <div class="mb-3">
                                 <label>HİKAYE & AÇIKLAMA</label>
-                                <textarea id="uDesc" class="form-control" rows="2" placeholder="Ürün detay sayfasında görünecek açıklama..."></textarea>
+                                <textarea id="uDesc" class="form-control" rows="2" placeholder="Ürünün hikayesi ve kısa tanıtımı..."></textarea>
                             </div>
 
                             <div class="p-3 mb-3 border border-secondary rounded bg-dark">
-                                <label class="text-warning mb-2 border-bottom border-secondary pb-1 w-100">TEKNİK DETAYLAR (DETAY SAYFASI İÇİN)</label>
-                                <div class="row g-2">
+                                <label class="text-warning mb-2 border-bottom border-secondary pb-1 w-100">TEKNİK ÖZELLİKLER (AKILLI SEÇİM)</label>
+                                <div class="row g-3">
+                                    
                                     <div class="col-6">
-                                        <input type="text" id="tMek" class="form-control form-control-sm" placeholder="Mekanizma (Örn: Otomatik)">
+                                        <label class="text-secondary small mb-1" style="font-size:0.6rem !important;">MEKANİZMA</label>
+                                        <select id="tMek" class="form-select form-select-sm">
+                                            <option value="Otomatik (İsviçre)">Otomatik (İsviçre)</option>
+                                            <option value="Otomatik (Japon)">Otomatik (Japon)</option>
+                                            <option value="Quartz (Pilli)">Quartz (Pilli)</option>
+                                            <option value="Mekanik Kurmalı">Mekanik Kurmalı</option>
+                                            <option value="Tourbillon Özel">Tourbillon Özel</option>
+                                            <option value="Solar (Güneş Enerjili)">Solar</option>
+                                        </select>
                                     </div>
+
                                     <div class="col-6">
-                                        <input type="text" id="tKasa" class="form-control form-control-sm" placeholder="Kasa (Örn: 42mm Çelik)">
+                                        <label class="text-secondary small mb-1" style="font-size:0.6rem !important;">KASA MATERYALİ</label>
+                                        <select id="tKasa" class="form-select form-select-sm">
+                                            <option value="316L Paslanmaz Çelik">Paslanmaz Çelik</option>
+                                            <option value="Titanyum">Titanyum</option>
+                                            <option value="Altın Kaplama">Altın Kaplama</option>
+                                            <option value="Karbon Fiber">Karbon Fiber</option>
+                                            <option value="Seramik">Seramik</option>
+                                            <option value="Bronz">Bronz</option>
+                                        </select>
                                     </div>
+
                                     <div class="col-6">
-                                        <input type="text" id="tCam" class="form-control form-control-sm" placeholder="Cam (Örn: Safir)">
+                                        <label class="text-secondary small mb-1" style="font-size:0.6rem !important;">CAM TİPİ</label>
+                                        <select id="tCam" class="form-select form-select-sm">
+                                            <option value="Safir Kristal (Çizilmez)">Safir Kristal</option>
+                                            <option value="Bombeli Safir">Bombeli Safir</option>
+                                            <option value="Mineral Cam">Mineral Cam</option>
+                                            <option value="Hardlex Kristal">Hardlex Kristal</option>
+                                            <option value="Akrilik">Akrilik</option>
+                                        </select>
                                     </div>
+
                                     <div class="col-6">
-                                        <input type="text" id="tSu" class="form-control form-control-sm" placeholder="Su (Örn: 10 ATM)">
+                                        <label class="text-secondary small mb-1" style="font-size:0.6rem !important;">SU GEÇİRMEZLİK</label>
+                                        <select id="tSu" class="form-select form-select-sm">
+                                            <option value="3 ATM (Sıçrama)">3 ATM</option>
+                                            <option value="5 ATM (Duş/Yağmur)">5 ATM</option>
+                                            <option value="10 ATM (Yüzme)">10 ATM</option>
+                                            <option value="20 ATM (Dalış)">20 ATM</option>
+                                            <option value="30 ATM (Profesyonel)">30 ATM</option>
+                                        </select>
                                     </div>
+
                                 </div>
                             </div>
 
                             <div class="mb-3">
                                 <label>ROZET (Opsiyonel)</label>
-                                <input type="text" id="uBadge" class="form-control" placeholder="Örn: YENİ, ÇOK SATAN">
+                                <select id="uBadge" class="form-select">
+                                    <option value="">Seçiniz...</option>
+                                    <option value="YENİ">✨ YENİ</option>
+                                    <option value="ÇOK SATAN">🔥 ÇOK SATAN</option>
+                                    <option value="VİTRİN YILDIZI">⭐ VİTRİN YILDIZI</option>
+                                    <option value="İNDİRİM">🏷️ İNDİRİM</option>
+                                    <option value="SINIRLI">💎 SINIRLI ÜRETİM</option>
+                                </select>
                             </div>
                             
                             <div class="mb-4">
@@ -196,8 +236,8 @@
         function resimOnizle(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
-                if (file.size > 1500000) { // 1.5MB Limit
-                    alert("⚠️ Resim boyutu büyük. Sayfa yavaşlayabilir. (Önerilen < 1.5MB)");
+                if (file.size > 2000000) { // 2MB Limit
+                    alert("⚠️ Resim boyutu büyük. Sayfa yavaşlayabilir. (Önerilen < 2MB)");
                 }
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -215,20 +255,20 @@
             const fiyat = document.getElementById('uFiyat').value;
             const kat = document.getElementById('uKat').value;
             const badge = document.getElementById('uBadge').value;
-            const desc = document.getElementById('uDesc').value || "Bu ürün için açıklama girilmemiştir."; // Varsayılan metin
+            const desc = document.getElementById('uDesc').value || "Bu ürün için açıklama girilmemiştir.";
 
-            // Teknik Veriler
+            // Seçicilerden gelen veriler
             const teknik = {
-                mekanizma: document.getElementById('tMek').value || "Standart Quartz",
-                kasa: document.getElementById('tKasa').value || "Paslanmaz Çelik",
-                cam: document.getElementById('tCam').value || "Mineral Cam",
-                su: document.getElementById('tSu').value || "3 ATM"
+                mekanizma: document.getElementById('tMek').value,
+                kasa: document.getElementById('tKasa').value,
+                cam: document.getElementById('tCam').value,
+                su: document.getElementById('tSu').value
             };
 
             if(!ad || !fiyat) { alert("Lütfen Ürün Adı ve Fiyat alanlarını doldurunuz."); return; }
             if(!secilenResimBase64) { alert("Lütfen bir ürün görseli yükleyiniz."); return; }
 
-            // Filtreleme için otomatik tag oluşturma
+            // Otomatik Filtreleme Etiketi
             let filterTag = "all";
             const k = kat.toLowerCase();
             if(k.includes("prestige") || k.includes("elite")) filterTag = "prestige";
@@ -244,8 +284,8 @@
                 badge: badge,
                 filter: filterTag,
                 img: secilenResimBase64,
-                desc: desc,       // ARTIK BU VERİ KAYDEDİLİYOR
-                teknik: teknik    // ARTIK BU VERİ KAYDEDİLİYOR
+                desc: desc,
+                teknik: teknik
             };
 
             try {
@@ -253,16 +293,17 @@
                 urunler.unshift(yeniUrun);
                 localStorage.setItem('saaturnUrunler', JSON.stringify(urunler));
 
+                // Formu Sıfırla
                 document.getElementById('urunForm').reset();
                 document.getElementById('imgPreview').style.display = 'none';
                 document.getElementById('noImgText').style.display = 'block';
                 secilenResimBase64 = "";
                 
                 urunleriListele();
-                alert("✅ Ürün ve teknik detaylar başarıyla kaydedildi!");
+                alert("✅ Ürün başarıyla eklendi!");
                 
             } catch (e) {
-                alert("❌ HATA: Hafıza doldu! Lütfen bazı ürünleri silin.");
+                alert("❌ HATA: Tarayıcı hafızası doldu! Lütfen bazı eski ürünleri silin.");
             }
         }
 
@@ -293,25 +334,10 @@
         }
 
         function urunSil(index) {
-            if(confirm("Silmek istiyor musunuz?")) {
+            if(confirm("Bu ürünü kalıcı olarak silmek istiyor musunuz?")) {
                 const urunler = JSON.parse(localStorage.getItem('saaturnUrunler'));
                 urunler.splice(index, 1);
                 localStorage.setItem('saaturnUrunler', JSON.stringify(urunler));
-                urunleriListele();
-            }
-        }
-
-        function varsayilanlariYukle() {
-            if(confirm("Tüm liste silinip, zengin içerikli varsayılan veriler yüklenecek. Onaylıyor musunuz?")) {
-                // DETAYLI VARSAYILAN VERİLER
-                const varsayilanlar = [
-                    { id: 1, ad: "Satürn ELITE", kat: "Prestige Series", fiyat: 24000, img: "assets/img/gallery/watch-gold.png", badge: "VİTRİN YILDIZI", filter: "prestige limited", desc: "Lüks ve zarafetin simgesi. Altın kaplama detaylar.", teknik: { mekanizma: "Otomatik (İsviçre)", kasa: "38mm Altın Kaplama", cam: "Safir", su: "10 ATM" } },
-                    { id: 2, ad: "Satürn OCEAN", kat: "Sport / Diver", fiyat: 12400, img: "assets/img/gallery/watch-2.png", badge: "", filter: "sport", desc: "Derinlerin hakimi dalgıç saati.", teknik: { mekanizma: "Otomatik", kasa: "44mm Titanyum", cam: "Hardlex", su: "30 ATM" } },
-                    { id: 3, ad: "Satürn TIMELESS", kat: "Classic", fiyat: 9250, img: "assets/img/gallery/watch-3.png", badge: "", filter: "classic", desc: "Klasik deri kordonlu tasarım.", teknik: { mekanizma: "Quartz", kasa: "40mm Çelik", cam: "Mineral", su: "5 ATM" } },
-                    { id: 5, ad: "Satürn NEBULA", kat: "Limited Edition", fiyat: 14000, img: "assets/img/gallery/watch-4.png", badge: "SINIRLI", filter: "limited", desc: "Uzay çağı tasarımı, karbon fiber kadran.", teknik: { mekanizma: "Mekanik", kasa: "45mm Karbon", cam: "Safir", su: "10 ATM" } },
-                    { id: 6, ad: "Satürn TITAN", kat: "Elite Series", fiyat: 22500, img: "assets/img/gallery/watch-5.png", badge: "YENİ", filter: "prestige", desc: "Titanyum gövde ve İsviçre mekanizması.", teknik: { mekanizma: "Otomatik", kasa: "44mm Titanyum", cam: "Safir", su: "20 ATM" } }
-                ];
-                localStorage.setItem('saaturnUrunler', JSON.stringify(varsayilanlar));
                 urunleriListele();
             }
         }
