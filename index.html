@@ -154,7 +154,6 @@
 
     <nav id="mainNav"></nav>
 
-    <!-- SLIDER BÖLÜMÜ -->
     <div id="anaSlider" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-pause="false">
         
         <div class="carousel-indicators" id="sliderIndicators" style="bottom: 20px;"></div>
@@ -169,18 +168,15 @@
         </button>
     </div>
 
-    <!-- DUYURULAR BÖLÜMÜ -->
     <section class="py-5 bg-black border-bottom border-secondary reveal">
         <div class="container py-2">
             <div class="row align-items-center">
-                <!-- Sol Başlık Alanı -->
                 <div class="col-lg-4 mb-4 mb-lg-0 text-center text-lg-start">
                     <span class="text-gold-gradient fw-bold" style="letter-spacing: 2px; font-size: 0.8rem;">GÜNCEL</span>
                     <h3 class="text-white serif-font display-6 mt-2">Duyurular &<br>Haberler</h3>
                     <p class="text-muted small mt-3">Saat dünyasındaki son gelişmeler ve markamızdan özel haberler.</p>
                     <a href="duyurular.html" class="text-white text-decoration-none small mt-3 d-inline-block border-bottom border-warning pb-1">Tümünü Görüntüle →</a>
                 </div>
-                <!-- Sağ Liste Alanı -->
                 <div class="col-lg-8">
                     <div id="noticeListWrapper" class="notice-container"></div>
                 </div>
@@ -188,7 +184,6 @@
         </div>
     </section>
 
-    <!-- VİTRİN BÖLÜMÜ -->
     <section class="py-5" style="background: #090909;">
         <div class="container py-4">
             <div class="text-center mb-5 reveal">
@@ -201,7 +196,6 @@
 
    <footer id="mainFooter"></footer>
 
-   <!-- MODALLAR -->
     <div class="modal fade" id="infoModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content" style="background: #1a1a1a; border: 1px solid #333;">
@@ -325,7 +319,27 @@
             sliderUrunleri.forEach((u, index) => {
                 const activeClass = index === 0 ? "active" : "";
                 indicators.innerHTML += `<button type="button" data-bs-target="#anaSlider" data-bs-slide-to="${index}" class="${activeClass}"></button>`;
-
+                
+                // Teknik özellikleri listelemek için HTML oluşturuldu
+                let ozellikHTML = '';
+                if(u.teknik) {
+                    const ozellikler = [
+                        {key: "Mekanizma", value: u.teknik.mekanizma},
+                        {key: "Kasa", value: u.teknik.kasa},
+                        {key: "Cam", value: u.teknik.cam},
+                        {key: "Su Direnci", value: u.teknik.su}
+                    ];
+                    
+                    ozellikler.forEach(o => {
+                        ozellikHTML += `
+                            <div class="col-6 col-md-3">
+                                <p class="text-gold-gradient fw-bold mb-0" style="font-size: 0.75rem; letter-spacing: 1px;">${o.key}</p>
+                                <p class="text-white small fw-light">${o.value}</p>
+                            </div>
+                        `;
+                    });
+                }
+                
                 const slideHTML = `
                 <div class="carousel-item ${activeClass}" data-bs-interval="6000" onclick="window.location.href='urun-detay.html?id=${u.id}'">
                     <div class="hero-bg"></div>
@@ -345,6 +359,9 @@
                                     </p>
                                 </div>
                                 
+                                <div class="row mt-5 border-start border-secondary py-3 text-start">
+                                    ${ozellikHTML}
+                                </div>
                                 <div class="hero-btn mt-4 text-center text-lg-start">
                                     <h3 class="text-white serif-font mb-4">${u.fiyat.toLocaleString()} ₺</h3>
                                     <span class="btn-gold-outline">İNCELE & SATIN AL</span>
