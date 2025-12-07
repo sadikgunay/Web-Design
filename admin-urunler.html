@@ -9,13 +9,14 @@
     <script src="https://unpkg.com/feather-icons"></script>
 
     <script>
+        // Oturum Kontrolü
         if(localStorage.getItem("saaturn_session") !== "active") {
             window.location.href = "admin-login.html";
         }
     </script>
 
     <style>
-        /* --- ORTAK TEMA --- */
+        /* --- CSS KODUNUZ (DEĞİŞTİRİLMEDEN BIRAKILDI) --- */
         :root { --gold: #D4AF37; --dark: #050505; --panel: #111; }
         body { background-color: var(--dark); color: #e0e0e0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
         
@@ -56,24 +57,17 @@
 
         /* --- RESPONSIVE AYARLAR --- */
         @media (max-width: 991px) {
-            .sidebar { transform: translateX(-100%); } /* Mobilde Gizle */
-            .sidebar.show { transform: translateX(0); } /* Açılınca Göster */
-            
-            .main-content { margin-left: 0; padding: 20px; padding-top: 70px; } /* Üstten boşluk bırak (Menü butonu için) */
-            
-            .mobile-toggle-btn { display: block; } /* Butonu göster */
-            
-            /* Form Elemanları Mobilde Alt Alta */
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.show { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; padding-top: 70px; }
+            .mobile-toggle-btn { display: block; }
             .col-6 { width: 100%; } 
-            
-            /* Tablo Mobilde Kaydırılabilir */
             .table-responsive { border: 1px solid #333; border-radius: 6px; }
         }
     </style>
 </head>
 <body onload="urunleriListele()">
 
-    <!-- MOBİL MENÜ BUTONU -->
     <button class="mobile-toggle-btn" onclick="toggleSidebar()">
         <i data-feather="menu"></i>
     </button>
@@ -82,7 +76,6 @@
         <div class="text-center mb-5">
             <h4 class="text-warning fw-bold pt-2">SAATÜRN</h4>
             <small class="text-muted" style="color:#888 !important;">YÖNETİCİ PANELİ</small>
-            <!-- Mobilde Kapat Butonu -->
             <button class="btn btn-sm btn-outline-secondary d-lg-none position-absolute top-0 end-0 m-3" onclick="toggleSidebar()">X</button>
         </div>
         <div class="d-flex flex-column">
@@ -99,7 +92,6 @@
     </nav>
 
     <div class="main-content">
-        <!-- Üst Başlık ve Buton -->
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
             <div>
                 <h6 class="text-secondary mb-1" style="color:#aaa !important;">ENVANTER</h6>
@@ -111,7 +103,6 @@
         </div>
 
         <div class="row g-4">
-            <!-- Form Alanı -->
             <div class="col-lg-5">
                 <div class="card-custom">
                     <div class="card-header-custom">
@@ -208,7 +199,6 @@
                 </div>
             </div>
 
-            <!-- Liste Alanı -->
             <div class="col-lg-7">
                 <div class="card-custom">
                     <div class="card-header-custom d-flex justify-content-between align-items-center">
@@ -247,58 +237,87 @@
             document.getElementById('sidebar').classList.toggle('show');
         }
 
+        // Resim Önizleme ve Base64 kaydetme
         function resimOnizle(input) {
             if (input.files && input.files[0]) {
+                const file = input.files[0];
                 const reader = new FileReader();
+                
+                // 1.5 MB (1.500.000 byte) üzeri dosyalar için uyarı
+                const MAX_SIZE = 1500000;
+                if (file.size > MAX_SIZE) {
+                    alert("Uyarı: Resim boyutu 1.5 MB'tan büyük. Local Storage'da kota sorunu yaşanabilir. Daha küçük bir resim seçilmesi önerilir.");
+                    // Yine de devam ediyoruz, ancak kullanıcıyı uyardık.
+                }
+
                 reader.onload = function(e) {
                     document.getElementById('imgPreview').src = e.target.result;
                     document.getElementById('imgPreview').style.display = 'inline-block';
                     document.getElementById('noImgText').style.display = 'none';
+                    // Base64 verisini değişkene kaydet
                     secilenResimBase64 = e.target.result;
                 }
-                reader.readAsDataURL(input.files[0]);
+                reader.readAsDataURL(file);
+            } else {
+                // Seçim iptal edilirse
+                document.getElementById('imgPreview').style.display = 'none';
+                document.getElementById('noImgText').style.display = 'block';
+                secilenResimBase64 = "";
             }
         }
 
+        // ⭐ Ürün Kaydetme Fonksiyonu (Hata Kontrollü) ⭐
         function urunKaydet() {
             const ad = document.getElementById('uAd').value;
-            const kat = document.getElementById('uKat').value;
             const fiyat = document.getElementById('uFiyat').value;
-            const aciklama = document.getElementById('uAciklama').value;
 
-            // Teknik Özellikleri Al
-            const teknik = {
-                mekanizma: document.getElementById('tMekanizma').value,
-                kasa: document.getElementById('tKasa').value,
-                cam: document.getElementById('tCam').value,
-                su: document.getElementById('tSu').value
-            };
-
-            if(!ad || !fiyat) { alert("Lütfen Ürün Adı ve Fiyat alanlarını doldurunuz."); return; }
-            if(!secilenResimBase64) { alert("Lütfen bir ürün görseli yükleyiniz."); return; }
+            if(!ad || !fiyat) { 
+                alert("Lütfen Ürün Adı ve Fiyat alanlarını doldurunuz."); 
+                return; 
+            }
+            if(!secilenResimBase64) { 
+                alert("Lütfen bir ürün görseli yükleyiniz."); 
+                return; 
+            }
 
             const yeniUrun = {
-                id: Date.now(),
+                id: Date.now(), // Benzersiz ID
                 ad: ad,
-                kat: kat,
+                kat: document.getElementById('uKat').value,
                 fiyat: parseInt(fiyat),
-                aciklama: aciklama,
+                aciklama: document.getElementById('uAciklama').value,
                 img: secilenResimBase64,
-                teknik: teknik
+                teknik: {
+                    mekanizma: document.getElementById('tMekanizma').value,
+                    kasa: document.getElementById('tKasa').value,
+                    cam: document.getElementById('tCam').value,
+                    su: document.getElementById('tSu').value
+                }
             };
 
-            const urunler = JSON.parse(localStorage.getItem('saaturnUrunler')) || [];
-            urunler.unshift(yeniUrun);
-            localStorage.setItem('saaturnUrunler', JSON.stringify(urunler));
+            try {
+                // Mevcut ürünleri çek veya boş dizi oluştur
+                const urunler = JSON.parse(localStorage.getItem('saaturnUrunler')) || [];
+                urunler.unshift(yeniUrun);
+                
+                // Local Storage'a kaydetmeyi dene
+                localStorage.setItem('saaturnUrunler', JSON.stringify(urunler));
 
-            // Formu Temizle
-            document.getElementById('urunForm').reset();
-            document.getElementById('imgPreview').style.display = 'none';
-            document.getElementById('noImgText').style.display = 'block';
-            secilenResimBase64 = "";
-            
-            urunleriListele();
-            alert("✅ Ürün ve teknik özellikler başarıyla kaydedildi!");
+                // Formu Temizle
+                document.getElementById('urunForm').reset();
+                document.getElementById('imgPreview').style.display = 'none';
+                document.getElementById('noImgText').style.display = 'block';
+                secilenResimBase64 = "";
+                
+                // Listeyi güncelle ve başarılı mesajı ver
+                urunleriListele();
+                alert("✅ Ürün ve teknik özellikler başarıyla kaydedildi!");
+                
+            } catch (e) {
+                // Local Storage hatası yakalandı (Büyük ihtimalle KOTA doldu)
+                alert("❌ Kaydetme Başarısız: Tarayıcı depolama (Local Storage) kotası doldu. Lütfen mevcut bazı ürünleri silin ve görsel boyutunu küçültün.");
+                console.error("Local Storage Kayıt Hatası:", e);
+            }
         }
 
         function urunleriListele() {
@@ -331,51 +350,37 @@
         function urunSil(index) {
             if(confirm("Bu ürünü silmek istediğinize emin misiniz?")) {
                 const urunler = JSON.parse(localStorage.getItem('saaturnUrunler'));
+                // Silme işlemi
                 urunler.splice(index, 1);
                 localStorage.setItem('saaturnUrunler', JSON.stringify(urunler));
                 urunleriListele();
+                alert("Ürün başarıyla silindi.");
             }
         }
 
+        // Varsayılan Ürünleri Yükleme
         function varsayilanlariYukle() {
             if(confirm("DİKKAT: Mevcut ürün listesi silinecek ve teknik özellikleri girilmiş varsayılan ürünler yüklenecek. Onaylıyor musunuz?")) {
                 
+                // Burada resimler Base64 olmadığı için, sunum için basit placeholder resim yolları kullanıldı.
+                // Eğer bu yollar gerçek resim dosyalarınızın yoluysa (assets/img/gallery altında), sorunsuz çalışır.
                 const varsayilanUrunler = [
-                    { 
-                        id: 1, ad: "Satürn ELITE", kat: "Prestige Series", fiyat: 24000, img: "assets/img/gallery/watch-gold.png", badge: "VİTRİN YILDIZI", 
-                        aciklama: "Lüks ve zarafetin simgesi. Altın kaplama detaylar ve en üst düzey İsviçre kalibresi ile sınırlı sayıda üretilmiştir.",
-                        teknik: { mekanizma: "Otomatik Kalibre (İsviçre)", kasa: "38mm Altın Kaplama", cam: "Bombeli Safir", su: "10 ATM (100m)" } 
-                    },
-                    { 
-                        id: 2, ad: "Satürn PRESTIGE", kat: "Prestige Series", fiyat: 18500, img: "assets/img/gallery/watch-1.png", badge: "ÇOK SATAN", 
-                        aciklama: "Profesyonellerin tercihi çelik kasa. Güvenilir Japon otomatik mekanizması ile hassas zaman tutuşu sağlar.",
-                        teknik: { mekanizma: "Otomatik (Japon)", kasa: "42mm Paslanmaz Çelik", cam: "Safir Kristal", su: "5 ATM (50m)" }
-                    },
-                    { 
-                        id: 3, ad: "Satürn OCEAN", kat: "Sport / Diver", fiyat: 12400, img: "assets/img/gallery/watch-2.png", badge: "", 
-                        aciklama: "Derinlerin hakimi dalgıç saati. 300 metreye kadar su geçirmezlik ve Titanyum hafifliği.",
-                        teknik: { mekanizma: "Otomatik (Japon)", kasa: "44mm Titanyum", cam: "Hardlex Kristal", su: "30 ATM (300m)" }
-                    },
-                    { 
-                        id: 4, ad: "Satürn TIMELESS", kat: "Classic", fiyat: 9250, img: "assets/img/gallery/watch-3.png", badge: "", 
-                        aciklama: "Klasik deri kordonlu tasarım. Güvenilir pilli (Quartz) mekanizması ile bakım gerektirmeyen hassasiyet.",
-                        teknik: { mekanizma: "Quartz (Pilli)", kasa: "40mm Paslanmaz Çelik", cam: "Mineral Cam", su: "5 ATM (50m)" }
-                    },
-                    { 
-                        id: 5, ad: "Satürn NEBULA", kat: "Limited Edition", fiyat: 14000, img: "assets/img/gallery/watch-4.png", badge: "SINIRLI SAYIDA", 
-                        aciklama: "Uzay çağı tasarımı, karbon fiber kadran ve ultra hafif kasa yapısıyla öne çıkıyor.",
-                        teknik: { mekanizma: "Mekanik Kurmalı", kasa: "45mm Karbon Fiber", cam: "Bombeli Safir", su: "10 ATM (100m)" } 
-                    },
-                    { 
-                        id: 6, ad: "Satürn TITAN", kat: "Elite Series", fiyat: 22500, img: "assets/img/gallery/watch-5.png", badge: "YENİ", 
-                        aciklama: "Titanyum gövde ve İsviçre mekanizmasının mükemmel uyumu. Hafifliği ve dayanıklılığı ile ömür boyu kullanıma uygun.",
-                        teknik: { mekanizma: "Otomatik Kalibre (İsviçre)", kasa: "44mm Titanyum", cam: "Safir Kristal", su: "20 ATM (200m)" } 
-                    }
+                    { id: 1, ad: "Satürn ELITE", kat: "Prestige Series", fiyat: 24000, img: "assets/img/gallery/watch-gold.png", aciklama: "Lüks ve zarafetin simgesi.", teknik: { mekanizma: "Otomatik Kalibre (İsviçre)", kasa: "38mm Altın Kaplama", cam: "Bombeli Safir", su: "10 ATM (100m)" } },
+                    { id: 2, ad: "Satürn PRESTIGE", kat: "Prestige Series", fiyat: 18500, img: "assets/img/gallery/watch-1.png", aciklama: "Profesyonellerin tercihi çelik kasa.", teknik: { mekanizma: "Otomatik (Japon)", kasa: "42mm Paslanmaz Çelik", cam: "Safir Kristal", su: "5 ATM (50m)" } },
+                    { id: 3, ad: "Satürn OCEAN", kat: "Sport / Diver", fiyat: 12400, img: "assets/img/gallery/watch-2.png", aciklama: "Derinlerin hakimi dalgıç saati.", teknik: { mekanizma: "Otomatik (Japon)", kasa: "44mm Titanyum", cam: "Hardlex Kristal", su: "30 ATM (300m)" } },
+                    { id: 4, ad: "Satürn TIMELESS", kat: "Classic", fiyat: 9250, img: "assets/img/gallery/watch-3.png", aciklama: "Klasik deri kordonlu tasarım.", teknik: { mekanizma: "Quartz (Pilli)", kasa: "40mm Paslanmaz Çelik", cam: "Mineral Cam", su: "5 ATM (50m)" } },
+                    { id: 5, ad: "Satürn NEBULA", kat: "Limited Edition", fiyat: 14000, img: "assets/img/gallery/watch-4.png", aciklama: "Uzay çağı tasarımı, karbon fiber kadran.", teknik: { mekanizma: "Mekanik Kurmalı", kasa: "45mm Karbon Fiber", cam: "Bombeli Safir", su: "10 ATM (100m)" } },
+                    { id: 6, ad: "Satürn TITAN", kat: "Elite Series", fiyat: 22500, img: "assets/img/gallery/watch-5.png", aciklama: "Titanyum gövde ve İsviçre mekanizması.", teknik: { mekanizma: "Otomatik Kalibre (İsviçre)", kasa: "44mm Titanyum", cam: "Safir Kristal", su: "20 ATM (200m)" } }
                 ];
 
-                localStorage.setItem('saaturnUrunler', JSON.stringify(varsayilanUrunler));
-                urunleriListele();
-                alert("✅ Varsayılan ürünler ve teknik özellikleri başarıyla yüklendi!");
+                try {
+                    localStorage.setItem('saaturnUrunler', JSON.stringify(varsayilanUrunler));
+                    urunleriListele();
+                    alert("✅ Varsayılan ürünler ve teknik özellikleri başarıyla yüklendi!");
+                } catch (e) {
+                    alert("❌ Varsayılanları yüklerken Local Storage kotası aşıldı.");
+                    console.error("Varsayılan Yükleme Hatası:", e);
+                }
             }
         }
 
