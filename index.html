@@ -1,101 +1,305 @@
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SAATÜRN | Luxury Timepieces</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+    
+    <style>
+        /* --- TEMEL AYARLAR --- */
+        :root { 
+            --gold-start: #BF953F; --gold-mid: #FCF6BA; --gold-end: #B38728; 
+            --black-bg: #050505; --card-bg: rgba(255, 255, 255, 0.03); 
+            --border-color: rgba(255, 255, 255, 0.1); 
+        }
+        body { background-color: var(--black-bg); color: #f0f0f0; font-family: 'Montserrat', sans-serif; overflow-x: hidden; font-weight: 300; }
+        h1, h2, h3, h4, .serif-font { font-family: 'Playfair Display', serif; }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; } 
+        ::-webkit-scrollbar-track { background: #111; } 
+        ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+        
+        .text-gold-gradient { background: linear-gradient(to right, var(--gold-start), var(--gold-mid), var(--gold-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
+        
+        /* --- NAVBAR --- */
+        .navbar { background: transparent; padding: 20px 0; transition: all 0.4s ease; z-index: 999; position: absolute; width: 100%; }
+        .navbar.scrolled { background: rgba(5, 5, 5, 0.95); backdrop-filter: blur(15px); padding: 10px 0; border-bottom: 1px solid var(--border-color); position: fixed; top:0; }
+        
+        /* --- SLIDER (HERO) --- */
+        .carousel-item { 
+            height: 100vh; min-height: 700px; 
+            position: relative; overflow: hidden; perspective: 1000px; cursor: pointer; 
+        } 
+        .hero-bg { 
+            position: absolute; inset: 0; 
+            background: radial-gradient(circle at 70% 50%, #222 0%, #000 70%); 
+            z-index: 0;
+        }
+        .hero-content { position: relative; z-index: 2; height: 100%; display: flex; align-items: center; }
+        
+        .display-huge { 
+            font-size: 4.5rem; line-height: 1.1; margin-bottom: 1rem; 
+            text-shadow: 0 10px 30px rgba(0,0,0,0.8); letter-spacing: -1px; 
+            background: linear-gradient(to bottom, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .text-mask-container { overflow: hidden; display: block; margin-bottom: 5px; }
+        .hero-txt-slide { display: inline-block; opacity: 0; width: 100%; }
+
+        @keyframes maskedSlideUp {
+            0% { opacity: 0; transform: translateY(100%); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes perspectiveEnter {
+            0% { opacity: 0; transform: translate3d(200px, 0, 0) rotateY(-45deg) scale(0.7); filter: blur(10px); }
+            100% { opacity: 1; transform: translate3d(0, 0, 0) rotateY(0deg) scale(1); filter: blur(0); }
+        }
+        @keyframes floatEffect {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero-product-img {
+            max-height: 550px; width: auto; max-width: 100%;
+            filter: drop-shadow(0 30px 50px rgba(0,0,0,0.8)); opacity: 0;
+        }
+        .carousel-item.active .hero-product-img {
+            animation: perspectiveEnter 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards, floatEffect 8s ease-in-out infinite 1.5s;
+        }
+
+        .btn-gold-outline {
+            position: relative; overflow: hidden; color: var(--gold-mid); border: 1px solid var(--gold-mid); 
+            padding: 15px 45px; letter-spacing: 3px; text-transform: uppercase; font-size: 0.9rem; 
+            transition: 0.4s; background: transparent; text-decoration: none; display: inline-block;
+        }
+        .btn-gold-outline:hover { background: var(--gold-mid); color: #000; box-shadow: 0 0 30px rgba(191, 149, 63, 0.6); }
+        
+        /* --- KARTLAR & LİSTELER --- */
+        .product-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 4px; padding: 30px 20px; position: relative; overflow: hidden; transition: 0.4s ease; height: 100%; }
+        .product-card:hover { transform: translateY(-10px); background: rgba(255,255,255,0.05); border-color: var(--gold-mid); }
+        .product-img { height: 220px; width: 100%; object-fit: contain; margin-bottom: 25px; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.6)); transition: 0.5s; }
+        .product-card:hover .product-img { transform: scale(1.08) rotate(-2deg); }
+        .price-tag { font-size: 1.3rem; color: #fff; margin: 15px 0; }
+
+        .notice-container { border-left: 1px solid var(--border-color); padding-left: 20px; }
+        .notice-item { background: linear-gradient(90deg, #111, transparent); padding: 15px; margin-bottom: 10px; cursor: pointer; transition: 0.3s; border-left: 3px solid #333; }
+        .notice-item:hover { border-left-color: var(--gold-start); padding-left: 20px; }
+
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 1s ease; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 991px) {
+            .navbar { padding: 10px 0; }
+            .carousel-item { height: auto; min-height: 100vh; padding-top: 100px; padding-bottom: 60px; }
+            .hero-bg { background: radial-gradient(circle at 50% 50%, #222 0%, #000 90%); }
+            .hero-content { align-items: flex-start; }
+            .hero-content .row { flex-direction: column-reverse; }
+            .display-huge { font-size: 2.8rem; letter-spacing: 0; }
+            .hero-txt-slide { text-align: center; }
+            .hero-product-img { max-height: 280px; margin-top: 2rem; margin-bottom: 2rem; max-width: 80%; }
+            .text-lg-start { text-align: center !important; }
+            .border-start { border-left: none !important; border-top: 1px solid var(--gold-mid); padding-top: 15px; margin-top: 15px; }
+            .btn-gold-outline { width: 100%; padding: 15px 0; }
+            .notice-container { border-left: none; padding-left: 0; margin-top: 20px; }
+            .modal-dialog { margin: 10px; }
+        }
+        @media (max-width: 380px) { .display-huge { font-size: 2.2rem; } .hero-product-img { max-height: 220px; } }
+    </style>
+</head>
+
+<body onload="initIndex()">
+
+    <nav id="mainNav"></nav>
+
+    <div id="anaSlider" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-pause="false">
+        <div class="carousel-indicators" id="sliderIndicators" style="bottom: 20px;"></div>
+        <div class="carousel-inner" id="sliderIcerik"></div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#anaSlider" data-bs-slide="prev" style="z-index: 20; width: 10%;"><span class="carousel-control-prev-icon"></span></button>
+        <button class="carousel-control-next" type="button" data-bs-target="#anaSlider" data-bs-slide="next" style="z-index: 20; width: 10%;"><span class="carousel-control-next-icon"></span></button>
+    </div>
+
+    <section class="py-5 bg-black border-bottom border-secondary reveal">
+        <div class="container py-2">
+            <div class="row align-items-center">
+                <div class="col-lg-4 mb-4 mb-lg-0 text-center text-lg-start">
+                    <span class="text-gold-gradient fw-bold" style="letter-spacing: 2px; font-size: 0.8rem;">GÜNCEL</span>
+                    <h3 class="text-white serif-font display-6 mt-2">Duyurular &<br>Haberler</h3>
+                    <p class="text-muted small mt-3">Saat dünyasındaki son gelişmeler ve markamızdan özel haberler.</p>
+                    <a href="duyurular.html" class="text-white text-decoration-none small mt-3 d-inline-block border-bottom border-warning pb-1">Tümünü Görüntüle →</a>
+                </div>
+                <div class="col-lg-8">
+                    <div id="noticeListWrapper" class="notice-container"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5" style="background: #090909;">
+        <div class="container py-4">
+            <div class="text-center mb-5 reveal">
+                <span class="text-secondary" style="letter-spacing: 4px; font-size: 0.8rem;">SEÇKİN PARÇALAR</span>
+                <h2 class="text-white serif-font display-5 mt-3">Vitrin</h2>
+            </div>
+            <div class="row g-4" id="vitrinListesi"></div>
+        </div>
+    </section>
+
+   <footer id="mainFooter"></footer>
+
+    <div class="modal fade" id="infoModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" style="background: #1a1a1a; border: 1px solid #333;">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title text-gold-gradient serif-font" id="mTitle">Duyuru</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter:invert(1);"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div id="mImgContainer" class="mb-3 text-center" style="display:none;">
+                        <img id="mImg" src="" class="img-fluid rounded border border-secondary" style="max-height: 200px;">
+                    </div>
+                    <p id="mContent" class="text-light fw-light"></p>
+                    <div class="mt-4 pt-3 border-top border-secondary d-flex justify-content-between align-items-center">
+                        <small id="mDate" class="text-muted"></small>
+                        <small class="text-secondary">Ek Dosya: <span id="mFile" class="text-white">Yok</span></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="acilModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content" style="border: 2px solid #dc3545; box-shadow: 0 0 30px rgba(220, 53, 69, 0.3);">
+                <div class="modal-header border-bottom border-secondary bg-dark">
+                    <h5 class="modal-title text-danger fw-bold" style="letter-spacing: 2px;">🚨 ÖNEMLİ DUYURU</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 p-lg-5 text-center bg-black">
+                    <div id="uImgContainer" class="mb-4" style="display:none;">
+                        <img id="uImg" src="" class="img-fluid rounded" style="max-height: 250px; border: 1px solid #333;">
+                    </div>
+                    <h2 class="text-white serif-font mb-3" id="uTitle">...</h2>
+                    <p class="text-secondary lead fw-light mb-4 fs-6" id="uContent">...</p>
+                    <div class="d-flex justify-content-center gap-3 flex-column flex-sm-row">
+                        <button type="button" class="btn btn-outline-light px-4" data-bs-dismiss="modal">TAMAM</button>
+                        <a id="acilLink" href="duyurular.html" class="btn btn-danger px-4">DUYURULARA GİT -></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         feather.replace();
 
         function initIndex() {
-            // ÖNCE VERİ KONTROLÜ YAPILMALI
-            verileriYukleVeKontrolEt(); 
-            
-            // SONRA SLIDER VE LİSTELER OLUŞTURULMALI
-            slideriOlustur(); 
-            vitriniGuncelle();
-            duyurulariGuncelle();
-            
-            // Slider Animasyonları
-            const myCarousel = document.getElementById('anaSlider');
-            function startTextAnimations(carouselItem) {
-                carouselItem.querySelectorAll('.hero-txt-slide').forEach(el => {
-                    el.style.animation = 'none';
-                    el.offsetHeight; 
-                });
-                carouselItem.querySelectorAll('.hero-txt-slide').forEach((el, i) => {
-                    const delay = (i * 0.15) + 0.2; 
-                    el.style.animation = `maskedSlideUp 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards ${delay}s`;
-                });
-            }
-            myCarousel.addEventListener('slid.bs.carousel', function (event) { 
-                startTextAnimations(event.relatedTarget);
-            });
-            const initialActive = myCarousel.querySelector('.carousel-item.active');
-            if(initialActive) startTextAnimations(initialActive);
-            
-            // Acil Duyuru Kontrolü
-            const duyurular = JSON.parse(localStorage.getItem('saaturnDuyurular')) || [];
-            if(duyurular.length > 0) {
-                const sonDuyuru = duyurular[0]; 
-                if(sonDuyuru.etiket === "ACİL") {
-                    document.getElementById('uTitle').innerText = sonDuyuru.baslik;
-                    document.getElementById('uContent').innerText = sonDuyuru.icerik;
-                    if(sonDuyuru.resim && sonDuyuru.resim !== "Yok") {
-                        document.getElementById('uImg').src = sonDuyuru.resim;
-                        document.getElementById('uImgContainer').style.display = 'block';
+            try {
+                // 1. Önce veriyi kontrol et (Eğer yoksa yükle, varsa dokunma)
+                verileriYukleVeKontrolEt(); 
+                
+                // 2. Arayüzü oluştur
+                slideriOlustur(); 
+                vitriniGuncelle();
+                duyurulariGuncelle();
+                
+                // 3. Slider Animasyonları
+                const myCarousel = document.getElementById('anaSlider');
+                if(myCarousel) {
+                    function startTextAnimations(carouselItem) {
+                        if(!carouselItem) return;
+                        carouselItem.querySelectorAll('.hero-txt-slide').forEach(el => {
+                            el.style.animation = 'none';
+                            el.offsetHeight; 
+                        });
+                        carouselItem.querySelectorAll('.hero-txt-slide').forEach((el, i) => {
+                            const delay = (i * 0.15) + 0.2; 
+                            el.style.animation = `maskedSlideUp 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards ${delay}s`;
+                        });
                     }
-                    setTimeout(() => {
-                        new bootstrap.Modal(document.getElementById('acilModal')).show();
-                    }, 1000);
+                    myCarousel.addEventListener('slid.bs.carousel', function (event) { 
+                        startTextAnimations(event.relatedTarget);
+                    });
+                    const initialActive = myCarousel.querySelector('.carousel-item.active');
+                    if(initialActive) startTextAnimations(initialActive);
                 }
-            }
 
-            window.addEventListener('scroll', reveal);
-            window.addEventListener('scroll', handleNavbar);
-            reveal(); 
+                // 4. Scroll Dinleyicileri
+                window.addEventListener('scroll', reveal);
+                window.addEventListener('scroll', handleNavbar);
+                
+                // 5. İlk Reveal Tetiklemesi (Sayfa açılınca içerik görünsün diye)
+                setTimeout(reveal, 100);
+
+            } catch (error) {
+                console.error("Kritik Hata:", error);
+                // Hata olsa bile içeriği göster
+                document.querySelectorAll('.reveal').forEach(el => el.classList.add('active'));
+            }
         }
 
-        // --- KRİTİK DÜZELTME BURADA ---
+        // --- VERİ KORUMA MEKANİZMASI ---
         function verileriYukleVeKontrolEt() {
-            // 1. Mevcut veriyi çekmeye çalış
-            const mevcutVeri = localStorage.getItem('saaturnUrunler');
+            try {
+                const mevcutVeri = localStorage.getItem('saaturnUrunler');
+                
+                // Eğer veri varsa ve dizi boş değilse DOKUNMA
+                if (mevcutVeri && mevcutVeri !== "[]" && mevcutVeri !== "null") {
+                    return; 
+                }
 
-            // 2. EĞER VERİ ZATEN VARSA, HİÇBİR ŞEY YAPMADAN ÇIK (Return)
-            // Bu sayede Admin panelinden eklediklerin silinmez.
-            if (mevcutVeri !== null && mevcutVeri !== "[]") {
-                console.log("Mevcut veri korundu.");
-                return; 
+                // Sadece veri yoksa varsayılanları yükle
+                const varsayilanUrunler = [
+                    { id: 1, ad: "Satürn ELITE", kat: "Prestige Series", fiyat: 24000, img: "assets/img/gallery/watch-gold.png", badge: "VİTRİN YILDIZI", desc: "Lüks ve zarafetin simgesi. Altın kaplama detaylar.", teknik: { mekanizma: "Otomatik (İsviçre)", kasa: "38mm Altın Kaplama", cam: "Safir", su: "10 ATM" } },
+                    { id: 2, ad: "Satürn PRESTIGE", kat: "Prestige Series", fiyat: 18500, img: "assets/img/gallery/watch-1.png", badge: "ÇOK SATAN", desc: "Profesyonellerin tercihi çelik kasa.", teknik: { mekanizma: "Otomatik (Japon)", kasa: "42mm Çelik", cam: "Safir", su: "5 ATM" } },
+                    { id: 3, ad: "Satürn OCEAN", kat: "Sport / Diver", fiyat: 12400, img: "assets/img/gallery/watch-2.png", badge: "", desc: "Derinlerin hakimi dalgıç saati.", teknik: { mekanizma: "Otomatik", kasa: "44mm Titanyum", cam: "Hardlex", su: "30 ATM" } },
+                    { id: 4, ad: "Satürn TIMELESS", kat: "Classic", fiyat: 9250, img: "assets/img/gallery/watch-3.png", badge: "", desc: "Klasik deri kordonlu tasarım.", teknik: { mekanizma: "Quartz", kasa: "40mm Çelik", cam: "Mineral", su: "5 ATM" } },
+                    { id: 5, ad: "Satürn NEBULA", kat: "Limited Edition", fiyat: 14000, img: "assets/img/gallery/watch-4.png", badge: "SINIRLI", desc: "Uzay çağı tasarımı, karbon fiber kadran.", teknik: { mekanizma: "Mekanik", kasa: "45mm Karbon", cam: "Safir", su: "10 ATM" } },
+                    { id: 6, ad: "Satürn TITAN", kat: "Elite Series", fiyat: 22500, img: "assets/img/gallery/watch-5.png", badge: "YENİ", desc: "Titanyum gövde ve İsviçre mekanizması.", teknik: { mekanizma: "Otomatik", kasa: "44mm Titanyum", cam: "Safir", su: "20 ATM" } }
+                ];
+                localStorage.setItem('saaturnUrunler', JSON.stringify(varsayilanUrunler));
+                
+            } catch (e) {
+                console.error("Veri yükleme hatası:", e);
+                // Hata durumunda da varsayılanları zorla yükle
             }
-
-            // 3. SADECE VERİ YOKSA (İlk defa giriliyorsa) Varsayılanları Yükle
-            const varsayilanUrunler = [
-                { id: 1, ad: "Satürn ELITE", kat: "Prestige Series", fiyat: 24000, img: "assets/img/gallery/watch-gold.png", badge: "VİTRİN YILDIZI", filter: "prestige limited", desc: "Lüks ve zarafetin simgesi. Altın kaplama detaylar.", teknik: { mekanizma: "Otomatik (İsviçre)", kasa: "38mm Altın Kaplama", cam: "Safir", su: "10 ATM" } },
-                { id: 2, ad: "Satürn PRESTIGE", kat: "Prestige Series", fiyat: 18500, img: "assets/img/gallery/watch-1.png", badge: "ÇOK SATAN", desc: "Profesyonellerin tercihi çelik kasa.", teknik: { mekanizma: "Otomatik (Japon)", kasa: "42mm Çelik", cam: "Safir", su: "5 ATM" } },
-                { id: 3, ad: "Satürn OCEAN", kat: "Sport / Diver", fiyat: 12400, img: "assets/img/gallery/watch-2.png", badge: "", filter: "sport", desc: "Derinlerin hakimi dalgıç saati.", teknik: { mekanizma: "Otomatik", kasa: "44mm Titanyum", cam: "Hardlex", su: "30 ATM" } },
-                { id: 4, ad: "Satürn TIMELESS", kat: "Classic", fiyat: 9250, img: "assets/img/gallery/watch-3.png", badge: "", filter: "classic", desc: "Klasik deri kordonlu tasarım.", teknik: { mekanizma: "Quartz", kasa: "40mm Çelik", cam: "Mineral", su: "5 ATM" } },
-                { id: 5, ad: "Satürn NEBULA", kat: "Limited Edition", fiyat: 14000, img: "assets/img/gallery/watch-4.png", badge: "SINIRLI", desc: "Uzay çağı tasarımı, karbon fiber kadran.", teknik: { mekanizma: "Mekanik", kasa: "45mm Karbon", cam: "Safir", su: "10 ATM" } },
-                { id: 6, ad: "Satürn TITAN", kat: "Elite Series", fiyat: 22500, img: "assets/img/gallery/watch-5.png", badge: "YENİ", desc: "Titanyum gövde ve İsviçre mekanizması.", teknik: { mekanizma: "Otomatik", kasa: "44mm Titanyum", cam: "Safir", su: "20 ATM" } }
-            ];
-            localStorage.setItem('saaturnUrunler', JSON.stringify(varsayilanUrunler));
-            console.log("Varsayılan veriler yüklendi.");
         }
         
         function slideriOlustur() {
-            // Hata Önleyici: Eğer veri yoksa boş dizi ata
-            const urunler = JSON.parse(localStorage.getItem('saaturnUrunler')) || [];
-            
+            let urunler = [];
+            try {
+                urunler = JSON.parse(localStorage.getItem('saaturnUrunler')) || [];
+            } catch (e) {
+                urunler = [];
+            }
+
             const container = document.getElementById('sliderIcerik');
             const indicators = document.getElementById('sliderIndicators');
+            if(!container || !indicators) return;
+
             container.innerHTML = "";
             indicators.innerHTML = "";
             
-            // Slider için seçilecek ürün ID'leri
-            const sliderIds = [3, 4, 1];
+            // Slider için ürün seçimi (Esnek yapı)
+            let sliderUrunleri = [];
             
-            // Sadece mevcut olan ürünleri slider'a ekle (Silinenler hata vermesin)
-            const sliderUrunleri = sliderIds.map(id => urunler.find(u => u.id == id)).filter(item => item !== undefined);
+            // 1. Plan: Belirli ID'leri dene
+            const hedefIds = [3, 4, 1];
+            sliderUrunleri = hedefIds.map(id => urunler.find(u => u.id == id)).filter(u => u !== undefined);
 
-            // Eğer hiç ürün kalmamışsa slider boş kalmasın diye uyarı koyma (Opsiyonel)
+            // 2. Plan: Eğer onlar silinmişse, ilk 3 ürünü al
             if(sliderUrunleri.length === 0 && urunler.length > 0) {
-                // Eğer özel ID'li ürünler silindiyse listedeki ilk ürünü slider yap
-                sliderUrunleri.push(urunler[0]);
+                sliderUrunleri = urunler.slice(0, 3);
             }
+
+            // 3. Plan: Hiç ürün yoksa fonksiyonu durdur (Hata vermez, sadece slider boş kalır)
+            if(sliderUrunleri.length === 0) return;
 
             sliderUrunleri.forEach((u, index) => {
                 const activeClass = index === 0 ? "active" : "";
@@ -160,15 +364,15 @@
         }
 
         function vitriniGuncelle() {
-            const urunler = JSON.parse(localStorage.getItem('saaturnUrunler')) || [];
+            let urunler = [];
+            try { urunler = JSON.parse(localStorage.getItem('saaturnUrunler')) || []; } catch(e){ return; }
+            
             const wrapper = document.getElementById('vitrinListesi');
+            if(!wrapper) return;
             wrapper.innerHTML = "";
 
-            // Vitrinde gösterilecek ürünler (Varsa ID 2,5,6 yoksa ilk 3 ürün)
             let vitrinData = urunler.filter(u => [2, 5, 6].includes(Number(u.id)));
-            if(vitrinData.length === 0 && urunler.length > 0) {
-                vitrinData = urunler.slice(0, 3);
-            }
+            if(vitrinData.length === 0 && urunler.length > 0) vitrinData = urunler.slice(0, 3);
 
             vitrinData.forEach(u => {
                 const kart = `
@@ -200,6 +404,7 @@
                 localStorage.setItem('saaturnDuyurular', JSON.stringify(duyurular));
             }
             const wrapper = document.getElementById('noticeListWrapper');
+            if(!wrapper) return;
             wrapper.innerHTML = "";
             duyurular.slice(0, 5).forEach(d => {
                 let badgeHTML = `<span class="badge bg-light text-dark mb-2 rounded-0" style="font-size: 0.6rem;">${d.etiket || 'DUYURU'}</span>`;
@@ -228,25 +433,36 @@
 
         function handleNavbar() {
             const nav = document.getElementById('mainNav');
+            if(!nav) return;
             if (window.scrollY > 50) nav.classList.add('scrolled');
             else nav.classList.remove('scrolled');
         }
 
         function openModal(title, content, date, file, imgName) {
-            document.getElementById('mTitle').innerText = title;
-            document.getElementById('mContent').innerText = content;
-            document.getElementById('mDate').innerText = date;
-            document.getElementById('mFile').innerText = file || "Yok";
-            
+            const elTitle = document.getElementById('mTitle');
+            const elContent = document.getElementById('mContent');
+            const elDate = document.getElementById('mDate');
+            const elFile = document.getElementById('mFile');
             const mImgContainer = document.getElementById('mImgContainer');
             const mImg = document.getElementById('mImg');
+
+            if(elTitle) elTitle.innerText = title;
+            if(elContent) elContent.innerText = content;
+            if(elDate) elDate.innerText = date;
+            if(elFile) elFile.innerText = file || "Yok";
             
-            if(imgName && imgName !== "Yok") {
-                mImg.src = imgName;
-                mImgContainer.style.display = "block";
-            } else {
-                mImgContainer.style.display = "none";
+            if(mImg && mImgContainer) {
+                if(imgName && imgName !== "Yok") {
+                    mImg.src = imgName;
+                    mImgContainer.style.display = "block";
+                } else {
+                    mImgContainer.style.display = "none";
+                }
             }
             new bootstrap.Modal(document.getElementById('infoModal')).show();
         }
     </script>
+</body>
+<script src="assets/js/footer.js"></script>
+<script src="assets/js/navbar.js"></script>
+</html>
